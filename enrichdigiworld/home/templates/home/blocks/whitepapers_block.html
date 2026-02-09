@@ -1,0 +1,169 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+
+<!-- Whitepapers Section -->
+<section class="whitepapers-section py-5 mb-10">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold mb-2" data-aos="fade-up">{{ block.value.title }}</h2>
+      {% if block.value.subtitle %}
+      <p class="text-muted fs-5" data-aos="fade-up" data-aos-delay="200">
+        {{ block.value.subtitle }}
+      </p>
+      {% endif %}
+    </div>
+
+    <!-- Category Filters -->
+    {% if block.value.show_filters %}
+    {% load home_tags %}
+    {% get_whitepaper_categories as categories %}
+
+    {% if categories %}
+    <div class="d-flex justify-content-center flex-wrap gap-2 mb-5" data-aos="fade-up" data-aos-delay="300">
+      <a href="#" class="btn btn-sm btn-outline-primary active" data-filter="all">All Categories</a>
+      {% for category in categories %}
+      <a href="#" class="btn btn-sm btn-outline-primary" data-filter="{{ category.slug }}">
+        {{ category.name }}
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endif %}
+
+    <!-- Whitepapers Grid -->
+    {% load home_tags %}
+    {% get_latest_whitepapers limit=block.value.limit as whitepapers %}
+
+    {% if whitepapers %}
+    <div class="row g-4">
+      {% for whitepaper in whitepapers %}
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter|mul:100 }}">
+        <div class="whitepaper-card h-100">
+          {% with preview_img=whitepaper.get_preview_image %}
+          {% if preview_img %}
+          <div class="whitepaper-image mb-3">
+            <a href="{% pageurl whitepaper %}">
+              {% image preview_img max-400x300 class="img-fluid" alt=whitepaper.title %}
+            </a>
+            {% if whitepaper.client %}
+            <span class="badge bg-primary position-absolute top-2 start-2">{{ whitepaper.client.name }}</span>
+            {% endif %}
+          </div>
+          {% endif %}
+          {% endwith %}
+
+          <div class="whitepaper-content">
+            <h5 class="fw-bold mb-2">
+              <a href="{% pageurl whitepaper %}" class="text-dark text-decoration-none">
+                {{ whitepaper.title }}
+              </a>
+            </h5>
+
+            {% with summary=whitepaper.get_summary %}
+            {% if summary %}
+            <p class="text-muted small mb-3">
+              {{ summary|truncatewords:20|richtext }}
+            </p>
+            {% endif %}
+            {% endwith %}
+
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted">
+                {{ whitepaper.first_published_at|date:"d M Y" }}
+              </small>
+              <a href="{% pageurl whitepaper %}" class="btn btn-sm btn-outline-primary">
+                Read More →
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center">
+      <p>No whitepapers available yet.</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+  .whitepapers-section {
+    background-color: #f8f9fa;
+  }
+
+  .whitepaper-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+  }
+
+  .whitepaper-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .whitepaper-image {
+    position: relative;
+    overflow: hidden;
+    height: 200px;
+  }
+
+  .whitepaper-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .whitepaper-card:hover .whitepaper-image img {
+    transform: scale(1.05);
+  }
+
+  .whitepaper-image .badge {
+    z-index: 1;
+  }
+
+  .whitepaper-content {
+    padding: 20px;
+  }
+
+  .whitepaper-content h5 {
+    color: #003057;
+    font-size: 1.1rem;
+  }
+
+  .whitepaper-content a {
+    transition: color 0.3s ease;
+  }
+
+  .whitepaper-content a:hover {
+    color: #667eea !important;
+  }
+
+  .btn-outline-primary {
+    color: #003057;
+    border-color: #003057;
+  }
+
+  .btn-outline-primary:hover {
+    background-color: #003057;
+    border-color: #003057;
+  }
+
+  @media (max-width: 768px) {
+    .whitepaper-image {
+      height: 150px;
+    }
+
+    .whitepaper-content {
+      padding: 15px;
+    }
+
+    .whitepaper-content h5 {
+      font-size: 1rem;
+    }
+  }
+</style>

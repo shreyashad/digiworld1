@@ -1,0 +1,102 @@
+<!-- Networks Section -->
+<section class="networks-section py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold mb-2" data-aos="fade-up">{{ block.value.title }}</h2>
+      {% if block.value.subtitle %}
+        <p class="text-muted fs-5" data-aos="fade-up" data-aos-delay="200">
+          {{ block.value.subtitle }}
+        </p>
+      {% endif %}
+    </div>
+
+    <!-- Networks Grid -->
+    {% load home_tags %}
+    {% get_network_links as networks %}
+    
+    {% if networks %}
+      <div class="d-flex justify-content-center flex-wrap gap-3" data-aos="fade-up" data-aos-delay="300">
+        {% for network in networks %}
+          <a 
+            href="{{ network.url }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="network-link"
+            title="{{ network.name }}"
+            data-aos="zoom-in"
+            data-aos-delay="{{ forloop.counter|mul:100 }}"
+          >
+            <i class="{{ network.icon_class }} fa-2x"></i>
+            <span class="network-name">{{ network.name }}</span>
+          </a>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+  .networks-section {
+    background-color: #f8f9fa;
+  }
+
+  .network-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    background: white;
+    color: #003057;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    gap: 10px;
+  }
+
+  .network-link:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    color: #667eea;
+  }
+
+  .network-link i {
+    transition: all 0.3s ease;
+  }
+
+  .network-link:hover i {
+    transform: scale(1.2);
+  }
+
+  .network-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100px;
+  }
+
+  @media (max-width: 768px) {
+    .network-link {
+      width: 100px;
+      height: 100px;
+    }
+
+    .network-link i {
+      font-size: 1.5rem;
+    }
+
+    .network-name {
+      font-size: 0.75rem;
+    }
+  }
+
+  /* Font Awesome Icons */
+  .fab {
+    font-family: 'Font Awesome 6 Brands';
+  }
+</style>

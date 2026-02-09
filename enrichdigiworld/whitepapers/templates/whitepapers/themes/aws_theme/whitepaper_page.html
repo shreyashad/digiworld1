@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags %}
+
+{% block content %}
+{# This file acts as a generic wrapper if needed, but the RoutablePage logic in models.py #}
+{# usually renders preview.html, landing.html, or thank_you.html directly. #}
+{# However, if this page is rendered directly, we show the preview content. #}
+
+{% include "whitepapers/themes/aws_theme/preview.html" %}
+{% endblock %}

@@ -1,0 +1,89 @@
+whitepaper_platform/
+│
+├── core/
+│   ├── models.py        # Site settings, branding, navigation
+│   ├── admin.py
+│   └── ...
+├── home/
+│   ├── models.py        # HomePage & StreamField blocks
+│   └── blocks.py
+├── whitepapers/
+│   ├── models.py        # WhitepaperPage, IndexPage, CategoryPage
+│   ├── snippets.py      # Author, Category, whitepaper templates
+│   ├── blocks.py
+│   └── utils.py         # PDF handling, versioning
+├── contacts/
+│   ├── models.py        # ContactPage, form handling
+│   └── forms.py
+├── legal/
+│   └── models.py        # PrivacyPolicyPage, TermsPage
+├── analytics/
+│   └── models.py        # Tracking & counters
+├── users/ (optional)
+│   └── models.py        # Roles, download history
+└── templates/
+    └── tailwind/        # Tailwind-based frontend templates
+
+
+1. CORE PRODUCT GOALS
+
+Your whitepaper platform should allow non-technical users to:
+Create, publish, version, gate, and distribute whitepapers
+Customize layouts, branding, SEO, CTAs, and forms
+Control access (public / gated / role-based)
+Track downloads, views, and conversions
+Reuse content blocks across pages
+Customize UI without touching code (as much as possible)
+
+
+2. GLOBAL CUSTOMIZATION (SITE-WIDE)
+
+2.1 Site Settings (Wagtail Settings)
+
+Model: SiteBrandingSettings
+
+Customizable from Admin:
+
+Logo (light / dark)
+Favicon
+Brand primary / secondary colors
+Typography choices (font family)
+Header layout style (dropdown, mega menu, minimal)
+Footer layout (columns, links, copyright text)
+Default CTA button text & URL
+Cookie consent toggle
+Analytics IDs (GA4, GTM)
+CDN / asset versioning flag
+
+
+@register_setting
+class SiteBrandingSettings(BaseSetting):
+    logo = models.ForeignKey("wagtailimages.Image", ...)
+    primary_color = models.CharField(max_length=20)
+    font_family = models.CharField(max_length=100)
+
+
+---
+
+3.2 Navigation Customization
+
+Snippet: NavigationMenu
+
+Menu title
+
+Menu items (Page / External URL)
+
+Dropdown enabled
+
+Order
+
+
+Supports:
+
+Header menu
+
+Footer menu
+
+Sidebar menu (for resource hubs)
+
+

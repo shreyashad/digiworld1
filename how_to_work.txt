@@ -1,0 +1,67 @@
+Exactly ✅ — that’s how the **Tailwind workflow works** in a Django/Wagtail project.
+
+Here’s the clear breakdown:
+
+---
+
+## 1️⃣ Development Mode (watching for changes)
+
+If you want Tailwind to **auto-rebuild CSS whenever you edit `input.css` or your templates**, you run **from the frontend folder**:
+
+```bash
+npx tailwindcss-cli -i ./input.css -o ../enrichdigiworld/static/css/tailwind.css --watch
+```
+
+* `-i ./input.css` → source file with Tailwind directives
+* `-o ../enrichdigiworld/static/css/tailwind.css` → output file Django/Wagtail will use
+* `--watch` → keeps running, rebuilds automatically on changes
+
+You **keep this terminal open** while developing.
+
+---
+
+## 2️⃣ Production / Build Mode
+
+When you’re ready to deploy or just want a minified version:
+
+```bash
+npx tailwindcss-cli -i ./input.css -o ../enrichdigiworld/static/css/tailwind.css --minify
+```
+
+* This builds **once**, minifies the CSS, and you don’t need `--watch`
+* Output goes straight to Django’s `static/` folder
+
+---
+
+## 3️⃣ Optional: Add npm scripts (recommended)
+
+Edit `frontend/package.json` and add:
+
+```json
+"scripts": {
+  "dev": "tailwindcss-cli -i ./input.css -o ../enrichdigiworld/static/css/tailwind.css --watch",
+  "build": "tailwindcss-cli -i ./input.css -o ../enrichdigiworld/static/css/tailwind.css --minify"
+}
+```
+
+Then you can simply run:
+
+```bash
+npm run dev   # for development
+npm run build # for production
+```
+
+No need to type the full Tailwind command each time. ✅
+
+---
+
+## 4️⃣ Key takeaway
+
+* **Yes**, you always build Tailwind CSS from wherever `input.css` and `tailwind.config.js` live (your `frontend` folder)
+* The **output** goes to Django/Wagtail’s `static/` folder so the site can use it
+
+---
+
+If you want, I can now **walk you step-by-step to integrate the dSign template into your Wagtail project**, using this Tailwind setup so it works perfectly and is editable.
+
+Do you want me to do that next?

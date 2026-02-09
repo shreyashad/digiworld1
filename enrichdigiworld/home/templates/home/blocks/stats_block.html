@@ -1,0 +1,194 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+
+<!-- Stats Section -->
+{% if block.value.background_image %}
+{% image block.value.background_image original as bg %}
+<section class="stats-section py-5 relative text-white"
+  style="background-image: url('{{ bg.url }}'); background-size: cover; background-position: center; background-attachment: fixed;">
+  <div class="absolute inset-0 bg-black/70 z-0"></div>
+  {% else %}
+  <section class="stats-section py-5 relative" style="background-color: #f8f9fa;">
+    {% endif %}
+
+    <div class="container relative z-10">
+      <!-- Stats Grid -->
+      {% load home_tags %}
+      {% get_stats_counters as stats %}
+
+      {% if stats %}
+      <div class="row g-4">
+        {% for stat in stats %}
+        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter|mul:100 }}">
+          <div class="stat-card text-center">
+            {% if stat.icon %}
+            <div class="stat-icon mb-3">
+              {% image stat.icon max-80x80 class="img-fluid" alt=stat.label %}
+            </div>
+            {% endif %}
+
+            <div class="stat-value h3 fw-bold mb-2 counter" data-target="{{ stat.value }}"
+              data-symbol="{{ stat.symbol }}">
+              0
+            </div>
+            <p class="stat-label mb-2">{{ stat.label }}</p>
+            {% if stat.description %}
+            <p class="stat-description">{{ stat.description }}</p>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <style>
+    /* Force Bootstrap grid to work */
+    .row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1.5rem;
+    }
+
+    .col-lg-3,
+    .col-md-6 {
+      width: 100%;
+    }
+
+    .stats-section {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stats-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+
+        {
+        % if not block.value.background_image %
+      }
+
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="1200" height="600" fill="none"/><rect width="1200" height="600" fill="url(%23grid)" /></svg>');
+
+        {
+        % endif %
+      }
+
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .stat-card {
+      position: relative;
+      z-index: 1;
+      transition: all 0.3s ease;
+      padding: 40px 20px;
+      background: transparent;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .stat-icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 15px;
+      min-height: 80px;
+    }
+
+    .stat-icon img {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .counter {
+      font-size: 3.5rem;
+      color: inherit;
+      font-weight: 700;
+      margin: 20px 0 10px 0;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: inherit !important;
+      margin-bottom: 10px !important;
+    }
+
+    .stat-description {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: inherit !important;
+      opacity: 0.8;
+    }
+
+    @media (max-width: 1024px) {
+      .row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      .counter {
+        font-size: 2.5rem;
+      }
+
+      .stat-card {
+        padding: 30px 15px;
+      }
+
+      .stat-label {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Counter animation
+      const counters = document.querySelectorAll('.counter');
+
+      const animateCounter = (counter) => {
+        const target = parseInt(counter.getAttribute('data-target'));
+        const symbol = counter.getAttribute('data-symbol') || '';
+        const duration = 2000;
+        const increment = target / (duration / 10);
+        let current = 0;
+
+        const timer = setInterval(() => {
+          current += increment;
+          if (current >= target) {
+            counter.textContent = target + symbol;
+            clearInterval(timer);
+          } else {
+            counter.textContent = Math.floor(current) + symbol;
+          }
+        }, 10);
+      };
+
+      // Intersection Observer for triggering animation on scroll
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            animateCounter(entry.target);
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.5 });
+
+      counters.forEach(counter => observer.observe(counter));
+    });
+  </script>

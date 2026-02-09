@@ -1,0 +1,30 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+
+<section class="py-20 bg-white">
+    <div class="container mx-auto px-4 md:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <!-- Text Column -->
+            <div class="order-2 lg:order-1">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-serif">
+                    {{ value.title }}
+                </h2>
+                <div class="text-lg text-gray-600 leading-relaxed prose prose-blue max-w-none">
+                    {{ value.description|richtext }}
+                </div>
+            </div>
+
+            <!-- Image Column -->
+            <div class="order-1 lg:order-2">
+                {% if value.image %}
+                {% image value.image width-800 as img %}
+                <div
+                    class="relative rounded-2xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-500">
+                    <img src="{{ img.url }}" alt="{{ value.title }}" class="w-full h-full object-cover">
+                    <!-- Subtle glass effect overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-transparent"></div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>

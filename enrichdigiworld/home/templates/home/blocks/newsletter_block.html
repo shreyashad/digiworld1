@@ -1,0 +1,67 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+
+<div class="-mt-32 relative z-3">
+  <div class="mx-auto max-w-7xl bg-blue-500 rounded-3xl overflow-hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-8">
+
+      <!-- LEFT COLUMN -->
+      <div class="hidden lg:block relative">
+        <div class="pt-20 relative">
+
+          {% if block.value.background_image %}
+            {% image block.value.background_image max-600x400 as bg %}
+            <img src="{{ bg.url }}" alt="" class="float-right">
+          {% endif %}
+
+          {% if block.value.leaf_image %}
+            {% image block.value.leaf_image max-100x100 as leaf %}
+            <img src="{{ leaf.url }}" class="absolute top-10 right-0" alt="">
+          {% endif %}
+
+          {% if block.value.circle_image %}
+            {% image block.value.circle_image max-40x40 as circle %}
+            <img src="{{ circle.url }}" class="absolute bottom-8 left-2" alt="">
+          {% endif %}
+
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="p-10 flex flex-col justify-center">
+        <h3 class="text-4xl md:text-5xl font-semibold mb-3 text-white">
+          {{ block.value.title }}
+        </h3>
+
+        {% if block.value.subtitle %}
+          <p class="text-base mb-7 text-white/80">
+            {{ block.value.subtitle }}
+          </p>
+        {% endif %}
+
+        <form method="POST" class="flex">
+          {% csrf_token %}
+          <input
+            type="email"
+            name="email"
+            required
+            placeholder="{{ block.value.placeholder }}"
+            class="py-4 text-sm w-full text-black bg-white rounded-l-lg pl-4"
+          >
+
+          <button
+            type="submit"
+            class="bg-blue-700 px-4 rounded-r-lg flex items-center justify-center"
+          >
+            {% if block.value.plane_icon %}
+              {% image block.value.plane_icon max-20x20 as plane %}
+              <img src="{{ plane.url }}" alt="">
+            {% else %}
+              {{ block.value.button_text }}
+            {% endif %}
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>

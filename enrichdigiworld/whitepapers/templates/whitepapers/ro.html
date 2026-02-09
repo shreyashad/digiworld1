@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags wagtailimages_tags widget_tweaks %}
+
+{% block content %}
+<div class="container py-5 whitepaper-page">
+
+  <div class="row g-5 align-items-start">
+
+    <!-- LEFT SECTION -->
+    <div class="col-md-7">
+
+      <!-- Title -->
+      <h1 class="fw-bold mb-3">{{ page.title }}</h1>
+
+      <!-- Publisher -->
+      {% if page.client %}
+      <p class="mb-3"><strong>Published by </strong><span class="text-primary">{{ page.client.name }}</span></p>
+      {% endif %}
+
+      <!-- Description -->
+      {% with summary=page.get_summary %}
+      {% if summary %}
+      <div class="whitepaper-description mb-4">{{ summary|richtext }}</div>
+      {% endif %}
+      {% endwith %}
+
+      <!-- ✅ STEP 1: Email verification  -->
+      {% if not form_submitted and email_verification %}
+      <div class=" text-white p-4 rounded mt-4 shadow-sm" style="background-color: rgb(0, 48, 87);">
+        <h3 class="mb-3">Verify Your Work Email <i class="bi bi-envelope-check"></i></h3>
+
+        <form method="POST" novalidate>
+          {% csrf_token %}
+          {% for field in form.visible_fields %}
+
+          <div class="mb-3">
+            {{ field.label_tag }}
+            {{ field|add_class:"form-control" }}
+            {% for error in field.errors %}
+            <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+          </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-primary mt-2">Verify Email</button>
+        </form>
+
+        <p class="mt-3 small">
+          Please use your company email. Public domains (e.g., Gmail, Yahoo) are not allowed.
+        </p>
+      </div>
+
+      <!-- ✅ STEP 2: Full form after email is verified -->
+      {% elif not form_submitted %}
+
+      <div class=" text-white p-4 rounded mt-4 shadow-sm" style="background-color: rgb(0, 48, 87);">
+        <h3 class="mb-3">Tell us about yourself <i class="bi bi-download"></i></h3>
+        <form method="POST">
+          {% csrf_token %}
+          {% for field in form.visible_fields %}
+          {% if field.field.widget.input_type == "radio" %}
+          <div class="form-group mb-3">
+            <label>{{ field.label }}</label>
+            {% for subwidget in field %}
+            <div class="form-check">
+              {{ subwidget.tag }}
+              <label class="form-check-label" for="{{ subwidget.id_for_label }}">
+                {{ subwidget.choice_label }}
+              </label>
+            </div>
+            {% endfor %}
+            {% for error in field.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          {% elif field.field.widget.input_type == "checkbox" %}
+          <div class="form-check mb-3">
+            {{ field|add_class:"form-check-input me-2 mt-1" }}
+            <label class="form-check-label" for="{{ field.id_for_label }}">
+              {{ field.label|safe }}
+            </label>
+            {% for error in field.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          {% else %}
+          <div class="mb-3">
+            {{ field.label_tag }}
+            {{ field|add_class:"form-control" }}
+            {% if field.name == email_field_name %}
+            <small class="text-warning">This email is already verified and cannot be changed.</small>
+            {% endif %}
+            {% for error in field.errors %}
+            <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+          </div>
+          {% endif %}
+          {% endfor %}
+
+          <button type="submit" class="btn btn-primary mt-2">Submit</button>
+        </form>
+
+        {# ? Display Disclaimer if available #}
+        {% if page.disclaimer %}
+        <div class="mt-4 small text-white">
+          {{ page.disclaimer|richtext }}
+        </div>
+        {% endif %}
+
+        <!-- <p class="mt-3 small">
+                By submitting this form you agree to be contacted with marketing-related emails or calls.
+                Read our <a href="#" class="text-info text-decoration-underline">Privacy Notice</a>.
+            </p> -->
+
+        <p class="small">
+          For questions, email <a href="mailto:dataprotection@yourdomain.com"
+            class="text-info">dataprotection@yourdomain.com</a>
+        </p>
+      </div>
+
+      <!--  STEP 3: After full form submission -->
+      {% else %}
+      <div class="alert alert-success mt-4">
+        Thank you! We are redirecting you shortly...
+      </div>
+
+      <script>
+        setTimeout(function () {
+          const thankYouUrl = "{{ page.thank_you_page.url }}?id={{ page.id }}";
+          window.location.href = thankYouUrl;
+        }, 1500);  // 1.5 seconds delay
+      </script>
+      {% endif %}
+
+
+      <!-- Categories -->
+      {% if page.categories.exists %}
+      <div class="mt-5">
+        <strong>Related Categories:</strong><br>
+        {% for category in page.categories.all %}
+        <a href="?category={{ category.slug }}" class="badge bg-secondary me-1">{{ category.name }}</a>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- RIGHT SECTION -->
+    <div class="col-md-5 text-center">
+      {% with preview_img=page.get_preview_image %}
+      {% if preview_img %}
+      <div class="mb-3">
+        {% image preview_img max-400x500 class="img-fluid rounded shadow" alt=page.title %}
+      </div>
+      {% endif %}
+      {% endwith %}
+
+      <div class="text-muted small text-start mt-4">
+        <p><strong>Published:</strong> {{ page.date|date:"d/m/Y" }}</p>
+        <p><strong>Lang:</strong> ENG</p>
+        <p><strong>Type:</strong> Whitepaper</p>
+        {% with pdf=page.get_pdf_file %}
+        {% if pdf %}
+        <p><strong>Length:</strong> {{ pdf.file.size|filesizeformat }} (approx)</p>
+        {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+  </div>
+
+  <!-- StreamField -->
+
+</div>
+{% endblock %}
+
+
+<div class="card h-100 border border-primary-subtle rounded-4 shadow-sm overflow-hidden position-relative">
+
+        <!-- Preview Image -->
+        
+          <div class="position-relative bg-light" style="height: 120px;">
+            
+            <img src="/media/images/aws_store_protect.max-500x400.max-200x200.png" alt="Store &amp; Protect eBook" class="position-absolute top-0 start-50 translate-middle-x mt-4 shadow-lg rounded" style="height: 80px; width: auto; z-index: 1;">
+          </div>
+        
+
+        <div class="card-body d-flex flex-column pt-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="d-flex align-items-center">
+                <!-- Client logo and name -->
+                  
+                    <div class="d-flex align-items-center mb-2">
+                      <img alt="Amazon-Web-Services-AWS-Logo-Transparent-PNG" class="me-2" height="23" src="/media/images/AWS_Logo.max-40x40.png" width="40">
+                      <strong class="text-muted">AWS</strong>
+                    </div>
+                  
+                </div>
+                <!-- Published date -->
+              <p class="text-muted small mb-0 text-end">
+                Published: <strong>Oct 25, 2025</strong>
+              </p>
+            </div>
+          <!-- Title -->
+          <h5 class="fw-semibold text-primary">Store &amp; Protect eBook</h5>
+
+          <!-- Description -->
+          <p class="text-muted small flex-grow-1 mb-3">
+            New to digitization? This free eBook about cloud storage helps small and medium-sized businesses (SMBs) understand key benefits and how they can save 31 percent …
+          </p>
+
+          <!-- Call to action -->
+          <div class="text-center mt-auto">
+            <a href="/whitepapers/store-protect-ebook/" class="btn btn-primary rounded-pill px-4">View More</a>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="group relative flex flex-col h-full bg-white rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.04)] hover:shadow-[0_40px_80px_rgba(0,0,0,0.12)] transition-all duration-500 transform hover:-translate-y-3"
+                data-aos="fade-up" data-aos-delay="{{ forloop.counter0|mul:100 }}">
+
+                <!-- Cover Image Area -->
+                <div class="relative h-64 overflow-hidden bg-gray-100">
+                    {% with preview_img=whitepaper.get_preview_image %}
+                    {% if preview_img %}
+                    {% image preview_img fill-800x600 class="w-full h-full object-cover
+                    transition-transform duration-700 group-hover:scale-110" %}
+                    {% else %}
+                    <div class="w-full h-full flex items-center justify-center bg-gray-50">
+                        <svg class="w-20 h-20 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+                            </path>
+                        </svg>
+                    </div>
+                    {% endif %}
+
+                    <!-- Client Logo Overlay -->
+                    {% if whitepaper.client and whitepaper.client.logo %}
+                    <div class="absolute bottom-4 left-6 bg-white/90 backdrop-blur-md rounded-xl p-2 shadow-lg">
+                        {% image whitepaper.client.logo height-40 class="h-8 w-auto object-contain" %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Featured Badge -->
+                    {% if whitepaper.is_featured %}
+                    <div
+                        class="absolute top-6 right-6 bg-[#006BC2] text-white text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg">
+                        Featured
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                </div>
+
+                <!-- Content Area -->
+                <div class="p-8 lg:p-10 flex flex-col flex-grow">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span
+                            class="text-[11px] font-black uppercase tracking-wider text-gray-400 bg-gray-50 px-3 py-1 rounded">
+                            {{ whitepaper.date|date:"M Y" }}
+                        </span>
+                        {% for cat in whitepaper.categories.all|slice:":1" %}
+                        <span class="text-[11px] font-black uppercase tracking-wider text-[#006BC2]">
+                            {{ cat.name }}
+                        </span>
+                        {% endfor %}
+                    </div>
+
+                    <h3
+                        class="text-2xl lg:text-3xl font-bold text-gray-900 mb-6 group-hover:text-[#006BC2] transition-colors leading-tight">
+                        <a href="{{ whitepaper.url }}">{{ whitepaper.title }}</a>
+                    </h3>
+
+                    <div class="text-gray-500 text-base leading-relaxed mb-10 line-clamp-3">
+                        {{ whitepaper.get_summary|richtext }}
+                    </div>
+
+                    <!-- CTA -->
+                    <div class="mt-auto">
+                        <a href="{{ whitepaper.url }}"
+                            class="group/btn inline-flex items-center gap-2 text-gray-900 font-bold text-sm lg:text-base hover:text-[#006BC2] transition-all">
+                            <span>Download Whitepaper</span>
+                            <svg class="w-5 h-5 transform group-hover/btn:translate-x-1 transition-transform"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6">
+                                </path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>

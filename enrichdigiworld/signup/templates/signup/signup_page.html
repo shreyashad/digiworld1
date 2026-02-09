@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags wagtailimages_tags widget_tweaks %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative py-20 flex items-center justify-center overflow-hidden">
+    {% if page.hero_image %}
+    {% image page.hero_image original as bg_img %}
+    <div class="absolute inset-0 z-0">
+        <img src="{{ bg_img.url }}" alt="{{ page.hero_title }}" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-black/60"></div>
+    </div>
+    {% else %}
+    <div class="absolute inset-0 z-0 bg-gray-900"></div>
+    {% endif %}
+
+    <div class="relative z-10 text-center px-4">
+        <h1 class="text-3xl md:text-5xl font-bold text-white mb-4 animate-fade-in-up">
+            {{ page.hero_title|default:page.title }}
+        </h1>
+        <div class="w-16 h-1 bg-blue-500 mx-auto rounded-full"></div>
+    </div>
+</section>
+
+<!-- Main Section -->
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4 md:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+
+            <!-- Left Column: Description -->
+            <div class="lg:col-span-6 space-y-6">
+                <div class="prose prose-lg prose-blue max-w-none text-gray-700 leading-relaxed">
+                    {% if page.side_description %}
+                    {{ page.side_description|richtext }}
+                    {% else %}
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6">Join Our Community</h2>
+                    <p>Stay ahead of the curve with our latest insights, whitepapers, and exclusive industry updates.
+                        Our platform provides the tools you need to excel in the digital landscape.</p>
+                    <ul class="space-y-4">
+                        <li class="flex items-center gap-3">
+                            <div class="bg-blue-100 p-2 rounded-full">
+                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <span>Access to premium whitepapers</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="bg-blue-100 p-2 rounded-full">
+                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <span>Exclusive invitations to webinars</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="bg-blue-100 p-2 rounded-full">
+                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <span>Weekly digital world news digest</span>
+                        </li>
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Right Column: Form -->
+            
+
+        </div>
+    </div>
+</section>
+
+<style>
+    @keyframes fade-in-up {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fade-in-up {
+        animation: fade-in-up 0.8s ease-out forwards;
+    }
+</style>
+{% endblock %}

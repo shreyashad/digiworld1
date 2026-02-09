@@ -1,0 +1,131 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+
+<!-- Testimonials Section -->
+<section class="testimonials-section py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+  <div class="container">
+    <div class="text-center mb-5 text-white">
+      <h2 class="fw-bold mb-2" data-aos="fade-up">{{ block.value.title }}</h2>
+      {% if block.value.subtitle %}
+        <p class="lead text-white-50" data-aos="fade-up" data-aos-delay="200">
+          {{ block.value.subtitle }}
+        </p>
+      {% endif %}
+    </div>
+
+    <!-- Testimonials Carousel -->
+    {% load home_tags %}
+    {% get_testimonials as testimonials %}
+    
+    {% if testimonials %}
+      <div class="testimonials-carousel position-relative" data-aos="fade-up" data-aos-delay="300">
+        <div class="row">
+          {% for testimonial in testimonials %}
+            <div class="col-lg-6">
+              <div class="testimonial-card mb-4">
+                <div class="testimonial-text mb-4">
+                  <p class="text-white fs-5 fst-italic">
+                    "{{ testimonial.text|striptags|truncatewords:50 }}"
+                  </p>
+                </div>
+
+                <div class="testimonial-author d-flex align-items-center">
+                  {% if testimonial.author_image %}
+                    <div class="author-image me-3">
+                      {% image testimonial.author_image max-60x60 class="rounded-circle" alt=testimonial.author_name %}
+                    </div>
+                  {% endif %}
+
+                  <div>
+                    <h6 class="text-white fw-bold mb-0">{{ testimonial.author_name }}</h6>
+                    {% if testimonial.author_title or testimonial.author_company %}
+                      <p class="text-white-50 small mb-0">
+                        {% if testimonial.author_title %}{{ testimonial.author_title }}{% endif %}
+                        {% if testimonial.author_company %}<br>{{ testimonial.author_company }}{% endif %}
+                      </p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+  .testimonials-section {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .testimonials-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 500px;
+    height: 500px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+  }
+
+  .testimonials-section::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -30%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+  }
+
+  .testimonial-card {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 30px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+  }
+
+  .testimonial-card:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-5px);
+  }
+
+  .testimonial-text {
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .testimonial-text p {
+    margin-bottom: 0;
+    line-height: 1.8;
+  }
+
+  .author-image {
+    flex-shrink: 0;
+  }
+
+  .author-image img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+  }
+
+  @media (max-width: 768px) {
+    .testimonial-card {
+      padding: 20px;
+    }
+
+    .testimonial-text p {
+      font-size: 1rem;
+    }
+  }
+</style>

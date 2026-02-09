@@ -1,0 +1,120 @@
+{% load wagtailcore_tags wagtailimages_tags wagtail_whitepapers %}
+
+<!-- Logo Cloud Section - Client Logos -->
+<section class="py-14 bg-white overflow-hidden" id="logo-cloud">
+  <div class="container mx-auto px-4 lg:max-w-7xl">
+
+    {% get_clients as clients %}
+    {% if clients %}
+    <div class="relative py-8">
+      <!-- Marquee Container -->
+      <div class="marquee-wrapper overflow-hidden relative">
+        <div class="flex marquee-track gap-12 lg:gap-24 w-max">
+          <!-- Set 1 -->
+          <div class="flex items-center gap-12 lg:gap-24 animate-marquee-slow">
+            {% for client in clients %}
+            <div class="flex-shrink-0 flex items-center justify-center h-20 w-40">
+              {% if client.logo %}
+              {% image client.logo max-160x80 class="max-w-full h-auto" alt=client.name %}
+              {% else %}
+              <span class="text-xl font-bold text-gray-400">{{ client.name }}</span>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          <!-- Set 2 -->
+          <div class="flex items-center gap-12 lg:gap-24 animate-marquee-slow" aria-hidden="true">
+            {% for client in clients %}
+            <div class="flex-shrink-0 flex items-center justify-center h-20 w-40">
+              {% if client.logo %}
+              {% image client.logo max-160x80 class="max-w-full h-auto" alt=client.name %}
+              {% else %}
+              <span class="text-xl font-bold text-gray-400">{{ client.name }}</span>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          <!-- Set 3 (Extra buffer for small client lists) -->
+          <div class="flex items-center gap-12 lg:gap-24 animate-marquee-slow" aria-hidden="true">
+            {% for client in clients %}
+            <div class="flex-shrink-0 flex items-center justify-center h-20 w-40">
+              {% if client.logo %}
+              {% image client.logo max-160x80 class="max-w-full h-auto" alt=client.name %}
+              {% else %}
+              <span class="text-xl font-bold text-gray-400">{{ client.name }}</span>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    <hr class="border-gray-300 mt-10 my-18" />
+  </div>
+
+</section>
+
+<style>
+  .marquee-wrapper {
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  }
+
+  .marquee-track {
+    display: flex;
+    width: fit-content;
+  }
+
+  .animate-marquee-slow {
+    display: flex;
+    flex-shrink: 0;
+    animation: marquee-scroll 15s linear infinite;
+    align-items: center;
+    gap: 3rem;
+    /* Same as gap-12 */
+  }
+
+  @media (min-width: 1024px) {
+    .animate-marquee-slow {
+      gap: 6rem;
+      /* Same as gap-24 */
+    }
+  }
+
+  @keyframes marquee-scroll {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(calc(-100% - 3rem));
+    }
+
+    /* Adjust based on gap */
+  }
+
+  @media (min-width: 1024px) {
+    @keyframes marquee-scroll {
+      from {
+        transform: translateX(0);
+      }
+
+      to {
+        transform: translateX(calc(-100% - 6rem));
+      }
+    }
+  }
+
+  .marquee-track:hover .animate-marquee-slow {
+    animation-play-state: paused;
+  }
+
+  #logo-cloud img {
+    display: block;
+    max-width: 160px;
+    max-height: 80px;
+    width: auto;
+    height: auto;
+  }
+</style>

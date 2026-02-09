@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block content %}
+<main class="bg-gray-50 min-h-screen flex items-center justify-center py-20 px-6">
+    <div
+        class="max-w-3xl w-full bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden transform animate-fade-in">
+
+        <!-- Header / Decoration -->
+        <div class="bg-blue-600 h-4 w-full"></div>
+
+        <div class="p-8 md:p-16 text-center text-black/90">
+            <!-- Success Icon -->
+            <div class="mb-8 flex justify-center">
+                <div
+                    class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-green-600 shadow-inner">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <h1 class="text-3xl md:text-4xl font-black text-gray-900 mb-6">
+                {{ block_value.thank_you_title|default:"Thank You for Your Interest!" }}
+            </h1>
+
+            {% if block_value.thank_you_text %}
+            <div class="prose prose-blue mx-auto text-gray-600 mb-10">
+                {{ block_value.thank_you_text|richtext }}
+            </div>
+            {% else %}
+            <p class="text-lg text-gray-600 mb-10">
+                Your request has been processed successfully. You can now download the whitepaper using the link below.
+            </p>
+            {% endif %}
+
+            <!-- Download Button -->
+            <div class="space-y-4">
+                <a href="{% pageurl page %}download/?token={{ download_token }}"
+                    class="inline-flex items-center justify-center px-12 py-5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xl rounded-2xl transition-all transform hover:scale-105 active:scale-95 shadow-xl shadow-blue-200">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Download Now
+                </a>
+
+                <p class="text-sm text-gray-400 mt-6">
+                    Haven't received the file? Click the button above to start the download manually.
+                </p>
+            </div>
+
+            <div class="mt-12 pt-8 border-t border-gray-100">
+                <a href="{% pageurl page %}" class="text-blue-600 font-bold hover:underline">
+                    &larr; Back to Whitepaper Details
+                </a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<style>
+    @keyframes fade-in {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fade-in {
+        animation: fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+</style>
+{% endblock %}

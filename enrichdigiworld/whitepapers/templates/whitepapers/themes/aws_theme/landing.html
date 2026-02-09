@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags wagtailimages_tags widget_tweaks wagtailroutablepage_tags %}
+
+{% block extra_css %}
+<style>
+    .aws-landing-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding-top: 3rem;
+    }
+
+    .aws-logo img {
+        height: 50px;
+        width: auto;
+    }
+
+    .aws-page-title {
+        font-size: 2.25rem;
+        font-weight: 400;
+        color: #232f3e;
+        margin-bottom: 2rem;
+    }
+
+    .aws-box-cover img {
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+        border-radius: 2px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .aws-landing-description {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #545b64;
+    }
+
+    /* Form Styling */
+    .aws-form-card {
+        background-color: #f2f3f3;
+        padding: 2.5rem;
+        border-radius: 2px;
+    }
+
+    .aws-form-title {
+        font-size: 1.5rem;
+        font-weight: 500;
+        text-align: center;
+        margin-bottom: 2rem;
+        color: #232f3e;
+    }
+
+    .aws-form-input {
+        width: 100%;
+        padding: 0.6rem 0.8rem;
+        border: 1px solid #aab7b8;
+        border-radius: 2px;
+        background: white;
+        margin-bottom: 0px;
+        font-size: 0.95rem;
+    }
+
+    .aws-form-input:focus {
+        border-color: #007eb9;
+        outline: none;
+        box-shadow: 0 0 0 1px #007eb9;
+    }
+
+    .aws-form-label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 0.4rem;
+        color: #232f3e;
+    }
+
+    .aws-form-radio-group {
+        margin-top: 1rem;
+    }
+
+    .aws-form-radio-label {
+        font-size: 0.9rem;
+        color: #545b64;
+        margin-bottom: 0.8rem;
+        display: block;
+    }
+
+    .aws-submit-btn {
+        background-color: #00527e;
+        color: white !important;
+        font-weight: 600;
+        padding: 0.75rem;
+        border-radius: 2px;
+        width: 100%;
+        margin-top: 1.5rem;
+        border: none;
+        transition: background-color 0.2s;
+    }
+
+    .aws-submit-btn:hover {
+        background-color: #003e5f;
+    }
+
+    .aws-privacy-notice {
+        font-size: 0.8rem;
+        color: #545b64;
+        line-height: 1.4;
+        margin-top: 1.5rem;
+    }
+
+    .aws-privacy-notice a {
+        color: #007eb9;
+        text-decoration: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="aws-landing-container py-12 px-4">
+    <!-- Top Logo -->
+    <div class="aws-logo mb-10">
+        {% if block_value.logo %}
+        {% image block_value.logo original %}
+        {% else %}
+        <img src="{% static 'images/aws-logo.png' %}" alt="AWS Logo">
+        {% endif %}
+    </div>
+
+    <!-- Page Title -->
+    <h2 class="aws-page-title">{{ block_value.hero_title }}</h2>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        <!-- Left Side: Content -->
+        <div class="lg:col-span-7">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                <div class="md:col-span-5 aws-box-cover">
+                    {% if block_value.cover_image %}
+                    {% image block_value.cover_image width-400 %}
+                    {% endif %}
+                </div>
+                <div class="md:col-span-7 aws-landing-description">
+                    {% if block_value.landing_description %}
+                    {{ block_value.landing_description|richtext }}
+                    {% elif block_value.intro_text %}
+                    {{ block_value.intro_text|richtext }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Form -->
+        <div class="lg:col-span-5">
+            <div class="aws-form-card">
+                <h3 class="aws-form-title">{{ block_value.form_title|default:"Download the eBook" }}</h3>
+
+                <form method="post" action="{% routablepageurl page 'submit' %}" class="space-y-4">
+                    {% csrf_token %}
+
+                    {% for field in form %}
+                    <div>
+                        <div class="flex flex-col">
+                            {% if field.field.widget.input_type == 'checkbox' %}
+                            <div class="flex items-start gap-3">
+                                {{ field|add_class:"mt-1" }}
+                                <label for="{{ field.id_for_label }}" class="text-sm text-gray-700">
+                                    {{ field.label }} {% if field.field.required %}*{% endif %}
+                                </label>
+                            </div>
+                            {% elif field.field.widget.input_type == 'radio' %}
+                            <label class="aws-form-label">{{ field.label }}</label>
+                            <div class="space-y-2">
+                                {% for radio in field %}
+                                <div class="flex items-center gap-2">
+                                    {{ radio.tag }}
+                                    <span class="text-sm text-gray-600">{{ radio.choice_label }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ field|add_class:"aws-form-input" }}
+                            {% endif %}
+                        </div>
+                        {% if field.errors %}
+                        <p class="text-red-600 text-xs mt-1">{{ field.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <!-- Interest Question (Screenshot Logic) -->
+                    {% if block_value.interest_question %}
+                    <div class="aws-form-radio-group">
+                        <label class="aws-form-label">{{ block_value.interest_question }}</label>
+                        <div class="space-y-2">
+                            {% for option in block_value.interest_options %}
+                            <label class="flex items-center gap-2 text-sm text-gray-600">
+                                <input type="radio" name="interest" value="{{ option.value }}" required>
+                                {{ option.label }}
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Consent and Privacy -->
+                    {% if block_value.consent_text %}
+                    <div class="flex items-start gap-2 mt-4 text-xs text-gray-600">
+                        <input type="checkbox" name="consent_checkbox" required class="mt-1">
+                        <div>{{ block_value.consent_text|richtext }}</div>
+                    </div>
+                    {% endif %}
+
+                    {% if block_value.privacy_notice %}
+                    <div class="aws-privacy-notice">
+                        {{ block_value.privacy_notice|richtext }}
+                    </div>
+                    {% endif %}
+
+                    <button type="submit" class="aws-submit-btn">
+                        {{ block_value.cta_text }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
