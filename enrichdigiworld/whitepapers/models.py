@@ -13,7 +13,7 @@ from modelcluster.models import ClusterableModel
 from django.shortcuts import redirect
 from django.shortcuts import render, redirect
 from wagtail.fields import StreamField
-from .blocks import AWSTemplateBlock, LenovoTemplateBlock, DefaultTemplateBlock
+from .blocks import AWSTemplateBlock, LenovoTemplateBlock, DefaultTemplateBlock, LenovoTemplate1Block, LenovoTemplate2Block, LenovoTemplate3Block
 
 
 
@@ -42,6 +42,17 @@ def generate_unique_slug(instance, value, field_name="slug"):
         unique = f"{slug}-{counter}"
         counter += 1
     return unique
+
+
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    if x_forwarded_for:
+        # Take the first IP in the list
+        return x_forwarded_for.split(",")[0].strip()
+    return request.META.get("REMOTE_ADDR", "0.0.0.0")
+
+
 
 
 @register_snippet
@@ -238,6 +249,8 @@ class WhitepaperPage(RoutablePageMixin, Page):
             ("default", DefaultTemplateBlock()),
             ("aws", AWSTemplateBlock()),
             ("lenovo", LenovoTemplateBlock()),
+            ("lenovo_template2", LenovoTemplate2Block()),
+            ("lenovo_template3", LenovoTemplate3Block()),
         ],
         use_json_field=True,
         min_num=1,
@@ -277,7 +290,7 @@ class WhitepaperPage(RoutablePageMixin, Page):
         block = self.get_template_block()
         if not block or not block.value:
             return None
-        return block.value.get('background_image') or block.value.get('cover_image') or block.value.get('logo') or block.value.get('background')
+        return block.value.get('background_image') or block.value.get('cover_image') or block.value.get('logo') or block.value.get('background') or block.value.get("preview_banner") or block.value.get("landing_image")
 
     def get_summary(self):
         """Returns a representative description/summary from the template block."""
@@ -318,6 +331,8 @@ class WhitepaperPage(RoutablePageMixin, Page):
         theme_map = {
             'aws': 'whitepapers/themes/aws_theme/',
             'lenovo': 'whitepapers/themes/lenovo_theme/',
+            'lenovo_template2': 'whitepapers/themes/lenovo_theme_template2/',
+            'lenovo_template3': 'whitepapers/themes/lenovo_theme_template3/',
             'default': 'whitepapers/themes/default_theme/'
         }
         base_path = theme_map.get(block.block_type, 'whitepapers/')
@@ -326,6 +341,19 @@ class WhitepaperPage(RoutablePageMixin, Page):
         if block.block_type == 'aws':
             if template_name == 'preview': return base_path + 'preview.html'
             if template_name == 'landing': return base_path + 'landing.html'
+        
+        if block.block_type == 'lenovo':
+            if template_name == 'preview': return base_path + 'preview.html'
+            if template_name == 'landing': return base_path + 'landing.html'
+        
+        if block.block_type == 'lenovo_template2':
+            if template_name == 'preview': return base_path + 'preview.html'
+            if template_name == 'landing': return base_path + 'landing.html'
+        
+        if block.block_type == 'lenovo_template3':
+            if template_name == 'preview': return base_path + 'preview.html'
+            if template_name == 'landing': return base_path + 'landing.html'
+        
         
         # Others use whitepaper_page.html for both
         if template_name in ['preview', 'landing']:
@@ -354,9 +382,21 @@ class WhitepaperPage(RoutablePageMixin, Page):
                 f_name = field_data['name']
                 f_required = field_data.get('required', True)
                 f_placeholder = field_data.get('placeholder', '')
-                f_choices = field_data.get('choices', [])
+                f_choices = field_data.get('choices', []) or []
+                
+                if f_type == 'heading':
+                    choices = [(c['value'], c['label']) for c in f_choices]
 
-                if f_type == 'email':
+                    field = forms.ChoiceField(
+                       label=f_label,
+                       required=f_required,
+                       choices=[("", "Select an option")] + choices,
+                        widget=forms.Select(attrs={"class": "heading-select"})
+                    )
+                    field.is_heading = True  # ?? custom flag
+                    fields[f_name] = field
+
+                elif f_type == 'email':
                     fields[f_name] = forms.EmailField(label=f_label, required=f_required, widget=forms.EmailInput(attrs={'placeholder': f_placeholder}))
                 elif f_type == 'select' or f_type == 'radio':
                     choices = [("", f_placeholder or "Select an option")]
@@ -380,7 +420,7 @@ class WhitepaperPage(RoutablePageMixin, Page):
     def preview(self, request):
         WhitepaperView.objects.create(
             whitepaper=self,
-            ip_address=request.META.get("REMOTE_ADDR"),
+            ip_address=get_client_ip(request),
             user_agent=request.META.get("HTTP_USER_AGENT", "")
         )
 
@@ -415,12 +455,15 @@ class WhitepaperPage(RoutablePageMixin, Page):
     def submit(self, request):
         form = self.get_form(request.POST)
         if form.is_valid():
-            # Process Lead
+    # Process Lead
+            ip = get_client_ip(request)
+        
+
             lead, created = Lead.objects.get_or_create(
                 whitepaper=self,
                 email=form.cleaned_data.get("email"),
                 defaults={
-                    "ip_address": request.META.get("REMOTE_ADDR"),
+                    "ip_address": ip,
                     "country": request.META.get("HTTP_X_COUNTRY", "Unknown"),
                     "user_agent": request.META.get("HTTP_USER_AGENT", ""),
                     "utm_source": request.GET.get("utm_source", ""),
@@ -502,8 +545,8 @@ class WhitepaperPage(RoutablePageMixin, Page):
 # -------- Tracking Models -------- #
 
 class WhitepaperView(models.Model):
-    whitepaper = models.ForeignKey("WhitepaperPage", on_delete=models.CASCADE)
-    ip_address = models.GenericIPAddressField()
+    whitepaper = models.ForeignKey("WhitepaperPage", on_delete=models.CASCADE, related_name="views")
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
     user_agent = models.TextField()
     viewed_at = models.DateTimeField(auto_now_add=True)
 
@@ -525,7 +568,7 @@ class Lead(models.Model):
     email = models.EmailField()
     full_name = models.CharField(max_length=255, blank=True)
 
-    ip_address = models.GenericIPAddressField()
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
     country = models.CharField(max_length=100)
     city = models.CharField(max_length=100, blank=True)
     user_agent = models.TextField()
@@ -547,7 +590,12 @@ class Lead(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ("whitepaper", "email")
+        #unique_together = ("whitepaper", "email")
+        indexes = [
+           models.Index(fields=["whitepaper", "email"]),
+           models.Index(fields=["submitted_at"]),
+           models.Index(fields=["status"]),
+        ]
 
     def __str__(self):
         return f"{self.email} - {self.whitepaper.title}"

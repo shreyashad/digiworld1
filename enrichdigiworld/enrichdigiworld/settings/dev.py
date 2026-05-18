@@ -1,7 +1,7 @@
 from .base import *
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-ad1buz+j=d7pim5%wv7)b-$q!l&drw0se4n7z&drxgklv(v%2^"

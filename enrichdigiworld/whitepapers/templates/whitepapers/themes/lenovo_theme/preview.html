@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags %}
+
+{% block extra_css %}
+<style>
+    .lenovo-page {
+        background-color: rgb(231, 231, 232);
+        min-height: 100vh;
+    }
+
+    .lenovo-shell {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .lenovo-header-wrap {
+        background: #fff;
+        border-bottom: 1px solid #c0c0c0;
+    }
+
+    .lenovo-logos {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+    }
+
+    .lenovo-logos img {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    .lenovo-logo-left {
+        max-width: 200px;
+    }
+
+    .lenovo-logo-right {
+        max-width: 220px;
+        margin-left: auto;
+    }
+
+    .lenovo-title-bar {
+        background: #000;
+        color: #fff;
+        padding: 40px 20px;
+        text-align: center;
+    }
+
+    .lenovo-title-bar h1 {
+        margin: 0;
+        font-family: "Mark Web Pro", "Century Gothic", sans-serif;
+        font-size: clamp(1.9rem, 3vw, 2.75rem);
+        font-weight: 500;
+        line-height: 1.3;
+    }
+
+    .lenovo-body {
+        background: #fff;
+    }
+
+    .lenovo-feature-image img {
+        width: 100%;
+        display: block;
+    }
+
+    .lenovo-copy {
+        padding: 10px 36px 0;
+        font-family: "Mark Web Pro", "Century Gothic", sans-serif;
+        color: #000;
+    }
+
+    .lenovo-copy p {
+        font-size: 16px;
+        line-height: 23px;
+        
+        font-weight: 500;
+        margin: 0 0 19px;
+    }
+    
+    .lenovo-copy h2,
+    .lenovo-copy h3,
+    .lenovo-copy h4 {
+        margin-top: 20px;
+        margin-bottom: 10px;
+        font-weight: 600;
+        line-height: 1.3;
+     }
+
+/* Bullet lists */
+.lenovo-copy ul {
+    padding-left: 20px;
+    margin-bottom: 16px;
+    list-style-type: disc;
+}
+
+.lenovo-copy ul li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+/* Numbered lists */
+.lenovo-copy ol {
+    padding-left: 20px;
+    margin-bottom: 16px;
+}
+
+.lenovo-copy ol li {
+    margin-bottom: 8px;
+}
+
+/* Links */
+.lenovo-copy a {
+    color: #0073e6;
+    text-decoration: underline;
+}
+
+/* Strong text */
+.lenovo-copy strong {
+    font-weight: 600;
+}
+
+/* Optional: blockquotes */
+.lenovo-copy blockquote {
+    border-left: 3px solid #000;
+    padding-left: 12px;
+    margin: 16px 0;
+    color: #444;
+}
+    .lenovo-cta-wrap {
+        padding: 0 36px 40px;
+    }
+
+    .lenovo-cta-btn {
+        width: 250px;
+        height: 47px;
+        background: #000;
+        border: none;
+        color: #fff !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-family: "Mark Web Pro", "Century Gothic", sans-serif;
+        font-size: 19px;
+        font-weight: 500;
+        line-height: 23px;
+    }
+
+    .lenovo-footer {
+        padding: 22px 20px 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.16);
+        text-align: center;
+        color: #000;
+        font: normal 11px/18px "Noto Sans", sans-serif;
+    }
+
+    .lenovo-footer a {
+        color: #0073e6;
+        text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+        .lenovo-logos {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .lenovo-logo-right {
+            margin-left: 0;
+            justify-self: end;
+        }
+
+        .lenovo-copy,
+        .lenovo-cta-wrap {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .lenovo-cta-btn {
+            width: 100%;
+            max-width: 250px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="lenovo-page">
+    <div class="lenovo-shell">
+        <div class="lenovo-header-wrap">
+            <div class="lenovo-logos">
+                <div style="padding: 20px 15px 10px 15px;">
+                    {% if block_value.logo_left %}
+                        {% image block_value.logo_left original class="lenovo-logo-left" %}
+                    {% else %}
+                        <img src="{% static 'images/lenovo-logo.png' %}" alt="Lenovo" class="lenovo-logo-left">
+                    {% endif %}
+                </div>
+                <div style="padding: 20px 15px 10px 15px;">
+                    {% if block_value.logo_right %}
+                        {% image block_value.logo_right original class="lenovo-logo-right" %}
+                    {% else %}
+                        <span class="lenovo-logo-right" style="display:block; height: 24px;"></span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="lenovo-title-bar">
+                <h1>{{ block_value.title }}</h1>
+            </div>
+        </div>
+
+        <div class="lenovo-body">
+            {% if block_value.preview_banner %}
+                <div class="lenovo-feature-image">
+                    {% image block_value.preview_banner fill-1200x700 %}
+                </div>
+            {% elif block_value.landing_image %}
+                <div class="lenovo-feature-image">
+                    {% image block_value.landing_image fill-1200x700 %}
+                </div>
+            {% endif %}
+
+            <div class="lenovo-copy">
+                {% if block_value.description_paragraph %}
+                    {{ block_value.description_paragraph|richtext }}
+                {% elif block_value.intro_text %}
+                    {{ block_value.intro_text|richtext }}
+                {% else %}
+                  <p> </p>
+                {% endif %}
+            </div>
+
+            <div class="lenovo-cta-wrap">
+                <center>
+                    <a href="{% routablepageurl page 'landing' %}" class="lenovo-cta-btn">
+                        {{ block_value.cta_text|default:"Download Now" }}
+                    </a>
+                </center>
+            </div>
+            <div class="lenovo-footer">
+                <div style="padding-bottom: 10px;">
+                    Copyright @ {% now "Y" %} Enrichdigiworld. All rights reserved
+                    <br>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

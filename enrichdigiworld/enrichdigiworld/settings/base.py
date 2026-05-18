@@ -96,11 +96,11 @@ WSGI_APPLICATION = "enrichdigiworld.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "digiworld",
-        "USER": "postgres",
-        "PASSWORD": "Mdi@2025",
+        "NAME": "enrichdigiworld_db",
+        "USER": "enrichdigiworld_user",
+        "PASSWORD": "Enrichdemand5707",
         "HOST": "localhost",
-        "PORT": "5432",
+        "PORT": "5434",
     }
 }
 

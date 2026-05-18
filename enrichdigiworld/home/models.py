@@ -343,7 +343,7 @@ class HomePage(Page):
         FieldPanel('body'),
     ]
 
-    subpage_types = ['whitepapers.WhitepaperIndexPage', 'aboutus.AboutUsPage', 'signup.SignupPage']
+    subpage_types = ['whitepapers.WhitepaperIndexPage', 'aboutus.AboutUsPage', 'signup.SignupPage', 'core.PolicyPage']
 
     def __str__(self):
         return self.title

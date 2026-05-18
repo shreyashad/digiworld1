@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags wagtailimages_tags %}
+
+{% block extra_css %}
+<style>
+    .lenovo2-thanks-shell {
+        max-width: 980px;
+        margin: 0 auto;
+    }
+
+    .lenovo2-thanks-card {
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 28px;
+        background: #ffffff;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .lenovo2-thanks-accent {
+        background: linear-gradient(135deg, #e2231a 0%, #b91c1c 100%);
+    }
+
+    .lenovo2-thanks-btn {
+        background: #e2231a;
+        color: white !important;
+        font-weight: 700;
+        padding: 0.95rem 2rem;
+        border-radius: 9999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .lenovo2-thanks-btn:hover {
+        background: #b91c1c;
+        transform: translateY(-1px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="lenovo2-thanks-shell px-4 py-10 lg:px-8 lg:py-16">
+    <section class="lenovo2-thanks-card">
+        <div class="lenovo2-thanks-accent px-6 py-5 text-white sm:px-8">
+            <div class="flex items-center gap-4">
+                {% if block_value.logo_left %}
+                    {% image block_value.logo_left original class="h-10 w-auto" %}
+                {% else %}
+                    <span class="text-sm font-semibold uppercase tracking-[0.2em]">Lenovo</span>
+                {% endif %}
+                <span class="text-sm font-medium text-white/90">Download complete</span>
+            </div>
+        </div>
+
+        <div class="px-6 py-10 sm:px-8 lg:px-10">
+            <div class="max-w-3xl">
+                <span class="inline-flex rounded-full bg-green-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-green-700">
+                    Thank you
+                </span>
+                <h1 class="mt-5 text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
+                    {{ block_value.thank_you_title|default:"Thank You!" }}
+                </h1>
+
+                <div class="prose mt-6 max-w-none text-gray-600">
+                    {% if block_value.thank_you_text %}
+                        {{ block_value.thank_you_text|richtext }}
+                    {% else %}
+                        <p>Your request has been received. You can download the Lenovo resource below.</p>
+                    {% endif %}
+                </div>
+
+                {% if download_token %}
+                    <div class="mt-10 flex flex-wrap items-center gap-4">
+                        <a href="{% pageurl page %}download/?token={{ download_token }}" class="lenovo2-thanks-btn">
+                            {{ block_value.cta_text|default:"Download Now" }}
+                        </a>
+                        <a href="/" class="text-sm font-semibold text-gray-600 hover:text-gray-950 transition-colors">
+                            Return to home
+                        </a>
+                    </div>
+                {% else %}
+                    <p class="mt-10 text-sm font-semibold text-red-600">
+                        Download link is not available. Please try the form again.
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

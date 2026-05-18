@@ -1,0 +1,188 @@
+{% extends "wagtailadmin/base.html" %}
+{% load wagtailadmin_tags %}
+
+{% block titletag %}Whitepaper Analytics{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .analytics-container {
+        padding: 20px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 2.5em;
+        font-weight: bold;
+        color: #2e1f5e;
+        margin: 10px 0;
+    }
+
+    .stat-label {
+        color: #666;
+        font-size: 1.1em;
+    }
+
+    .chart-container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        margin-bottom: 20px;
+    }
+
+    .grid-half {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .grid-half {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% include "wagtailadmin/shared/header.html" with title="Whitepaper Analytics" icon="pick" %}
+
+<div class="analytics-container">
+    <!-- Summary Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Leads</div>
+            <div class="stat-value">{{ total_leads }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Total Views</div>
+            <div class="stat-value">{{ total_views }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Conversion Rate</div>
+            <div class="stat-value">{{ conversion_rate }}%</div>
+        </div>
+    </div>
+
+    <!-- Lead Trends Chart -->
+    <div class="chart-container">
+        <h3>Lead Trends (Last 30 Days)</h3>
+        <canvas id="leadTrendsChart" height="300"></canvas>
+    </div>
+
+    <div class="grid-half">
+        <!-- Top Whitepapers (Leads) -->
+        <div class="chart-container">
+            <h3>Top Whitepapers by Leads</h3>
+            <canvas id="topLeadsChart" height="250"></canvas>
+        </div>
+
+        <!-- Top Whitepapers (Views) -->
+        <div class="chart-container">
+            <h3>Top Whitepapers by Views</h3>
+            <canvas id="topViewsChart" height="250"></canvas>
+        </div>
+    </div>
+
+    <!-- Whitepaper Performance Table -->
+    <div class="chart-container">
+        <h3>Whitepaper Performance & Lead Download</h3>
+        <table class="listing full-width">
+            <thead>
+                <tr>
+                    <th style="text-align: left;">Whitepaper</th>
+                    <th>Leads</th>
+                    <th>Views</th>
+                    <th>Conv. %</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for wp in top_whitepapers %}
+                <tr>
+                    <td style="text-align: left;">{{ wp.title }}</td>
+                    <td>{{ wp.lead_count }}</td>
+                    <td>{{ wp.view_count }}</td>
+                    <td>{{ wp.conversion_rate }}%</td>
+                    <td>
+                        <a href="{{ lead_index_url }}?whitepaper={{ wp.id }}"
+                            class="button button-small">View Leads</a>
+                        <a href="{{ lead_index_url }}?whitepaper={{ wp.id }}&export=csv"
+                            class="button button-small button-secondary">Download CSV</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Lead Trends
+    const trendData = {
+        labels: [{% for item in lead_trends %}"{{ item.date|date:'M d' }}"{% if not forloop.last %}, {% endif %} {% endfor %}],
+    datasets: [{
+        label: 'New Leads',
+        data: [{% for item in lead_trends %}{{ item.count }}{% if not forloop.last %}, {% endif %} {% endfor %}],
+    borderColor: '#2e1f5e',
+        backgroundColor: 'rgba(46, 31, 94, 0.1)',
+            fill: true,
+                tension: 0.4
+            }]
+        };
+    new Chart(document.getElementById('leadTrendsChart'), {
+        type: 'line',
+        data: trendData,
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    // Top Whitepapers (Leads)
+    const topLeadsData = {
+        labels: [{% for wp in top_whitepapers %}"{{ wp.title }}"{% if not forloop.last %}, {% endif %} {% endfor %}],
+    datasets: [{
+        label: 'Leads',
+        data: [{% for wp in top_whitepapers %}{{ wp.lead_count }}{% if not forloop.last %}, {% endif %} {% endfor %}],
+    backgroundColor: '#2e1f5e'
+            }]
+        };
+    new Chart(document.getElementById('topLeadsChart'), {
+        type: 'bar',
+        data: topLeadsData,
+        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
+    });
+
+    // Top Whitepapers (Views)
+    const topViewsData = {
+        labels: [{% for wp in top_views %}"{{ wp.title }}"{% if not forloop.last %}, {% endif %} {% endfor %}],
+    datasets: [{
+        label: 'Views',
+        data: [{% for wp in top_views %}{{ wp.view_count }}{% if not forloop.last %}, {% endif %} {% endfor %}],
+    backgroundColor: '#ef8220'
+            }]
+        };
+    new Chart(document.getElementById('topViewsChart'), {
+        type: 'bar',
+        data: topViewsData,
+        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
+    });
+</script>
+{% endblock %}

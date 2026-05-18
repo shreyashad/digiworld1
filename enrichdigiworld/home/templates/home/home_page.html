@@ -2,25 +2,27 @@
 {% load static wagtailcore_tags wagtailimages_tags %}
 
 {% block content %}
-<div class="home-page">
+<div class="home-page space-y-16 lg:space-y-20">
   {% for block in page.body %}
-    {% if block.block_type == 'hero' %}
-      {% include "home/blocks/hero_block.html" %}
-    {% elif block.block_type == 'logo_cloud' %}
-      {% include "home/blocks/logo_cloud_block.html" %}
-    {% elif block.block_type == 'stats' %}
-      {% include "home/blocks/stats_block.html" %}
-    {% elif block.block_type == 'services' %}
-      {% include "home/blocks/services_block.html" %}
-    {% elif block.block_type == 'whitepapers' %}
-      {% include "home/blocks/whitepapers_block.html" %}
-    {% elif block.block_type == 'testimonials' %}
-      {% include "home/blocks/testimonials_block.html" %}
-    {% elif block.block_type == 'networks' %}
-      {% include "home/blocks/networks_block.html" %}
-    {% elif block.block_type == 'newsletter' %}
-      {% include "home/blocks/newsletter_block.html" %}
-    {% endif %}
+    <div>
+      {% if block.block_type == 'hero' %}
+        {% include "home/blocks/hero_block.html" %}
+      {% elif block.block_type == 'logo_cloud' %}
+        {% include "home/blocks/logo_cloud_block.html" %}
+      {% elif block.block_type == 'stats' %}
+        {% include "home/blocks/stats_block.html" %}
+      {% elif block.block_type == 'services' %}
+        {% include "home/blocks/services_block.html" %}
+      {% elif block.block_type == 'whitepapers' %}
+        {% include "home/blocks/whitepapers_block.html" %}
+      {% elif block.block_type == 'testimonials' %}
+        {% include "home/blocks/testimonials_block.html" %}
+      {% elif block.block_type == 'networks' %}
+        {% include "home/blocks/networks_block.html" %}
+      {% elif block.block_type == 'newsletter' %}
+        {% include "home/blocks/newsletter_block.html" %}
+      {% endif %}
+    </div>
   {% endfor %}
 </div>
 {% endblock content %}

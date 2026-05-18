@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags %}
+
+{% block extra_css %}
+<style>
+    .lenovo3-page {
+        background-color: rgb(231, 231, 232);
+        min-height: 100vh;
+    }
+
+    .lenovo3-shell {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 14px;
+    }
+
+    .lenovo3-header-wrap {
+        background: #fff;
+        border-bottom: 1px solid #c0c0c0;
+    }
+
+    .lenovo3-top {
+        display: grid;
+        grid-template-columns: 1fr;
+        align-items: center;
+    }
+
+    .lenovo3-top img {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    .lenovo3-logo-left {
+        max-width: 170px;
+    }
+
+    .lenovo3-title-bar {
+        background: #000;
+        color: #fff;
+        padding: 26px 18px;
+        text-align: center;
+    }
+
+    .lenovo3-title-bar h1 {
+        font-family:  "Arial", "Helvetica", "sans-serif";
+        font-size: 34px;          /* closer to Lenovo landing */
+        line-height: 1.25;
+        font-weight: 700;         /* bold like reference */
+        margin: 0;
+        letter-spacing: -0.01em; 
+    }
+
+    .lenovo3-body {
+        background: #fff;
+    }
+
+    .lenovo3-feature-image img {
+        width: 100%;
+        display: block;
+    }
+
+    .lenovo3-copy {
+        padding: 12px 22px 0;
+    }
+
+    .lenovo3-copy p {
+        font-family: "Arial", "Helvetica", "sans-serif";
+        font-size: 15px;
+        line-height: 22px;
+        color: #000;
+        font-weight: 500;
+        margin: 0 0 16px;
+    }
+
+    .lenovo3-questions {
+        padding: 8px 22px 20px;
+    }
+
+    .lenovo3-questions h2 {
+        margin: 0 0 10px;
+        font-family: "Mark Web Pro", "Century Gothic", sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #111;
+    }
+
+    .lenovo3-question {
+        margin: 0 0 10px;
+        padding-left: 14px;
+        border-left: 2px solid #e2231a;
+        font-family: "Mark Web Pro", "Century Gothic", sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #111;
+    }
+
+    .lenovo3-cta-wrap {
+        padding: 0 22px 28px;
+    }
+
+    .lenovo3-cta-btn {
+        width: 220px;
+        height: 44px;
+        background: #000;
+        border: none;
+        color: #fff !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-family: "Mark Web Pro", "Century Gothic", sans-serif;
+        font-size: 17px;
+        font-weight: 500;
+        line-height: 23px;
+    }
+
+    .lenovo3-footer {
+        padding: 18px 16px 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.16);
+        text-align: center;
+        color: #000;
+        font: normal 10px/16px "Noto Sans", sans-serif;
+    }
+
+    .lenovo3-footer a {
+        color: #0073e6;
+        text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+        .lenovo3-copy,
+        .lenovo3-questions,
+        .lenovo3-cta-wrap {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .lenovo3-cta-btn {
+            width: 100%;
+            max-width: 250px;
+        }
+
+        .lenovo3-title-bar {
+            padding: 22px 16px;
+        }
+
+        .lenovo3-title-bar h1 {
+            font-size: 1.6rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="lenovo3-page">
+    <div class="lenovo3-shell">
+        <div class="lenovo3-header-wrap">
+            <div class="lenovo3-top">
+                <div style="padding: 20px 15px 10px 15px;">
+                    {% if block_value.logo_left %}
+                        {% image block_value.logo_left original class="lenovo3-logo-left" %}
+                    {% else %}
+                        <img src="{% static 'images/lenovo-logo.png' %}" alt="Lenovo" class="lenovo3-logo-left">
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="lenovo3-title-bar">
+                <h1>{{ block_value.title }}</h1>
+            </div>
+        </div>
+
+        <div class="lenovo3-body">
+            {% if block_value.preview_banner %}
+                <div class="lenovo3-feature-image">
+                    {% image block_value.preview_banner fill-1200x700 %}
+                </div>
+            {% elif block_value.landing_image %}
+                <div class="lenovo3-feature-image">
+                    {% image block_value.landing_image fill-1200x700 %}
+                </div>
+            {% endif %}
+
+            <div class="lenovo3-copy">
+                {% if block_value.description_paragraph %}
+                    {{ block_value.description_paragraph|richtext }}
+                {% elif block_value.intro_text %}
+                    {{ block_value.intro_text|richtext }}
+                {% else %}
+                    <p>One of the easiest ways to start reaping the benefits of Generative AI: By rolling out AI-enabled PCs to the workforce.</p>
+                    <p>91% of global enterprises already considering or piloting this approach.</p>
+                    <p>Read about the various ways in which AI PCs can deliver security, productivity, employee experience, and sustainability improvements to your enterprise.</p>
+                {% endif %}
+            </div>
+
+            {% if block_value.question_points %}
+                <div class="lenovo3-questions">
+                    <h2>Questions &amp; insights</h2>
+                    {% for item in block_value.question_points %}
+                        <div class="lenovo3-question">{{ item }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="lenovo3-cta-wrap">
+                <center>
+                    <a href="{% routablepageurl page 'landing' %}" class="lenovo3-cta-btn">
+                        {{ block_value.cta_text|default:"Download Now" }}
+                    </a>
+                </center>
+            </div>
+
+            <div class="lenovo3-footer">
+                <div style="padding-bottom: 10px;">
+                    Copyright @ {% now "Y" %} EnrichDigiWorld. All rights reserved
+                    <br>
+                    If you do not wish to receive future email,
+                    <a href="https://enrichdigiworld.com/privacy-policy/" target="_blank" rel="noopener">Click Here.</a>
+                    <br>
+                    This email cannot be copied without prior written permission from EnrichDigiWorld
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

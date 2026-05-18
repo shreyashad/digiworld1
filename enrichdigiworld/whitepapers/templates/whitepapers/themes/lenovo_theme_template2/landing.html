@@ -1,0 +1,328 @@
+{% extends "base.html" %} 
+{% load static wagtailcore_tags wagtailimages_tags widget_tweaks wagtailroutablepage_tags %} 
+{% block extra_css %}
+<style>
+  .lenovo2-page {
+    font-family: "Arial", "Helvetica", "sans-serif";
+} 
+  .lenovo2-header {
+    background: #fff;
+    border-bottom: 2px solid #e6e6e6;
+  }
+
+  .lenovo2-header-inner {
+    display: flex;
+    align-items: center;
+    padding: 18px 22px;
+  }
+
+  .lenovo2-logo-left img {
+    max-height: 34px;
+    width: auto;
+    display: block;
+  }
+
+  .lenovo2-logo-right img {
+    max-height: 40px;
+    width: auto;
+    display: block;
+  }
+
+  .lenovo2-logo-divider {
+    width: 2px;
+    height: 46px;
+    background: #222;
+    margin: 0 18px;
+   }
+
+  .lenovo2-form-field input:not([type="checkbox"]):not([type="radio"]),
+  .lenovo2-form-field select,
+  .lenovo2-form-field textarea {
+    width: 100%;
+    height: 44px;
+    border-radius: 2px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    padding: 0 0.75rem;
+    font-size: 0.875rem;
+    color: #111827;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .lenovo2-form-field textarea {
+    height: auto;
+    min-height: 96px;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .lenovo2-form-field input:not([type="checkbox"]):not([type="radio"]):focus,
+  .lenovo2-form-field select:focus,
+  .lenovo2-form-field textarea:focus {
+    outline: none;
+    border-color: #7dd3fc;
+    box-shadow: 0 0 0 1px #7dd3fc;
+  }
+
+  .lenovo2-bullet-list ul {
+    list-style: disc;
+    padding-left: 1.5rem;
+    margin: 0;
+  }
+
+  .lenovo2-bullet-list li {
+    margin-bottom: 0.85rem;
+}
+  /* Bullet lists */
+ .lenovo2-copy ul {
+    margin: 16px 0;
+    padding-left: 22px;
+    list-style-type: disc;
+ }
+
+ .lenovo2-copy ul li {
+    margin-bottom: 10px;
+    line-height: 1.6;
+ }
+
+/* Numbered lists */
+ .lenovo2-copy ol {
+    margin: 16px 0;
+    padding-left: 22px;
+ }
+
+ .lenovo2-copy ol li {
+    margin-bottom: 10px;
+ }
+
+/* Strong text */
+ .lenovo2-copy strong {
+    font-weight: 600;
+ }
+
+/* Links */
+ .lenovo2-copy a {
+    color: #000;
+    text-decoration: underline;
+ }
+
+  .lenovo2-consent-copy p,
+  .lenovo2-privacy p {
+    margin: 0;
+  }
+ .lenovo2-copy {
+    padding: 28px 24px 10px;
+    font-size: 15px;
+    line-height: 1.7;
+}
+  @media (max-width: 767px) {
+    .lenovo2-header-inner {
+      justify-content: center;
+    }
+
+    .lenovo2-logo-left img,
+    .lenovo2-logo-right img {
+      max-height: 28px;
+    }
+
+    .lenovo2-logo-divider {
+      height: 30px;
+      margin: 0 10px;
+    }
+
+  }
+</style>
+{% endblock %} 
+
+{% block content %}
+    <div class="flex justify-center p-2">
+        <main class="w-full min-h-screen flex justify-center px-4">
+            <section class="w-full max-w-4xl bg-white shadow-md my-6">
+                <header class="lenovo2-header">
+                    <div class="lenovo2-header-inner">
+                    <div class="lenovo2-logo-left">
+                        {% if block_value.logo_left %} 
+                        {% image block_value.logo_left original %} 
+                        {% endif %}
+                    </div>
+
+                    {% if block_value.logo_right %}
+                    <div class="lenovo2-logo-divider"></div>
+
+                    <div class="lenovo2-logo-right">
+                        {% image block_value.logo_right original %}
+                    </div>
+                    {% endif %}
+                    </div>
+                </header>
+
+                <div class="bg-black flex justify-center">
+                   <p class="text-white font-bold text-xl sm:text-[28px] leading-tight py-8 sm:py-10 px-8 text-center">
+                        {{ block_value.title }}
+                    </p>
+
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-0 w-full">
+                    <div class="md:col-span-3 flex flex-col bg-white">
+                        <div class="lenovo2-copy">
+                            {% if block_value.landing_description %} 
+                                {{ block_value.landing_description|richtext }} 
+                            {% elif block_value.description_paragraph %} 
+                                {{ block_value.description_paragraph|richtext }} 
+                            {% elif block_value.intro_text %} 
+                                {{ block_value.intro_text|richtext }} 
+                            {% endif %} 
+                            {% if block_value.question_points %}
+                                <div class="lenovo2-bullet-list mt-4">
+                                    <ul>
+                                        {% for item in block_value.question_points %}
+                                        <li>{{ item }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %} 
+                            {% if not block_value.question_points and block_value.highlights %}
+                                <div class="lenovo2-bullet-list mt-4">
+                                    <ul>
+                                        {% for item in block_value.highlights %}
+                                        <li>{{ item }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="px-6 pb-6">
+                            {% if block_value.landing_image %} 
+                                {% image block_value.landing_image fill-997x539 class="w-full h-auto shadow-md rounded-sm" %} 
+                            {% elif block_value.preview_banner %} 
+                                {% image block_value.preview_banner fill-997x539 class="w-full h-auto shadow-md rounded-sm" %} 
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="md:col-span-2 w-full flex flex-col border-t md:border-t-0 md:border-l border-[#dcdcdc] bg-gray-50/30">
+                        <div class="px-6 pt-6 pb-6 flex flex-col justify-center">
+                            <form
+                                method="post"
+                                action="{% routablepageurl page 'submit' %}"
+                                class="space-y-4 text-black"
+                            >
+                            {% csrf_token %} 
+                                {% for item in block_value.form_fields %} 
+                                    {% if item.field_type == "heading" %}
+                                        <div class="mt-6 mb-2">
+                                            <p class="text-[16px] font-bold text-gray-900 leading-snug">
+                                                {{ item.label }}
+                                            </p>
+                                        </div>
+                                        {% for field in form %}
+                                            {% if field.name == item.name %}
+                                                <div class="lenovo2-form-field">
+                                                    {{ field }}
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %} 
+                                        {% for field in form %} 
+                                            {% if field.name == item.name %}
+                                                <div class="lenovo2-form-field">
+                                                    {% if field.field.widget.input_type == "checkbox" %}
+                                                        <label class="flex items-start gap-2 text-sm text-gray-700">
+                                                            {{ field }}
+                                                            <span class="text-[15px] leading-snug">{{ field.label|safe }}</span>
+                                                        </label>
+                                                    {% elif field.field.widget.input_type == "radio" %}
+                                                <div>
+                                                <span class="text-sm font-semibold text-gray-700 mb-1 block">
+                                                    {{ field.label }}
+                                                </span>
+                                                <div class="space-y-2">
+                                                    {% for radio in field %}
+                                                    <label
+                                                    class="flex items-center gap-2 text-sm text-gray-700"
+                                                    >
+                                                    {{ radio.tag }}
+                                                    <span>{{ radio.choice_label }}</span>
+                                                    </label>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+
+                            {% else %} 
+                            {{ field|add_class:"" }} 
+                            {% endif %} 
+                            {% if field.errors %}
+                            <p class="mt-1 text-xs font-semibold text-red-600">
+                            {{ field.errors.0 }}
+                            </p>
+                            {% endif %}
+                        </div>
+
+                        {% endif %} {% endfor %} {% endif %} {% endfor %}
+                        <div class="pt-1">
+                            <label class="flex items-start gap-2 text-md text-gray-700">
+                            <input
+                                class="mt-1"
+                                type="checkbox"
+                                name="consent_checkbox"
+                                id="lenovo2-consent-checkbox"
+                                required
+                            />
+                            <span class="text-[15px] leading-snug lenovo2-consent-copy">
+                                {% if block_value.consent_text %} 
+                                {{ block_value.consent_text|richtext }} 
+                                {% endif %}
+                            </span>
+                            </label>
+                        </div>
+
+                        {% if block_value.privacy_notice %}
+                        <div
+                            class="pt-2 text-[15px] leading-snug text-gray-700 lenovo2-privacy"
+                        >
+                            {{ block_value.privacy_notice|richtext }}
+                        </div>
+                        {% else %}
+                        <div
+                            class="pt-2 text-[15px] leading-snug text-gray-700 lenovo2-privacy"
+                        >
+                            By submitting this feedback form, you are providing your consent
+                            to receive marketing communication via email and phone from
+                            <a
+                            class="text-[#337ab7] hover:text-[#23527c] hover:underline"
+                            href="https://enrichdigiworld.com/privacy-policy/"
+                            target="_blank"
+                            rel="noopener"
+                            >Enrichdigiworld</a
+                            >
+                            and its business partners.
+                        </div>
+                        {% endif %}
+
+                        <button
+                            type="submit"
+                            id="submit_button"
+                            name="submit"
+                            value="download"
+                            class="w-full rounded-sm cursor-pointer bg-black text-white py-3 text-sm font-semibold uppercase tracking-wide transition disabled:opacity-60"
+                        >
+                            {{ block_value.cta_text|default:"Download Now" }}
+                        </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            <footer class="flex flex-col items-center text-center p-2 text-black text-[11px] mb-4 space-y-0.5"
+            >
+                <p>
+                    Copyright &copy; {% now "Y" %} Enrichdigiworld. All rights reserved
+                </p>
+            </footer>
+            </section>
+        </main>
+    </div>
+{% endblock %}
+

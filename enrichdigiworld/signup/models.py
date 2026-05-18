@@ -22,13 +22,20 @@ class SignupPage(AbstractEmailForm):
         on_delete=models.SET_NULL,
         related_name='+'
     )
-    
+    section_image = models.ForeignKey(
+        'wagtailimages.Image',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
     side_description = RichTextField(blank=True)
     thank_you_text = RichTextField(blank=True)
 
     content_panels = AbstractEmailForm.content_panels + [
         FieldPanel('hero_title'),
         FieldPanel('hero_image'),
+        FieldPanel('section_image'),
         FieldPanel('side_description'),
         InlinePanel('form_fields', label="Form fields"),
         FieldPanel('thank_you_text'),

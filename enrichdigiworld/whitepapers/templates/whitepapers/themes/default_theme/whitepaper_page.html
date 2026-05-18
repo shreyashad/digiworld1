@@ -2,170 +2,345 @@
 {% load wagtailcore_tags wagtailimages_tags %}
 
 {% block content %}
-<main class="bg-gray-50 min-h-screen">
-    <!-- ================= HERO SECTION ================= -->
-    <section class="relative bg-white border-b border-gray-200">
-        {% if block_value.background_image %}
-        {% image block_value.background_image fill-1920x600 as bg %}
-        <div class="absolute inset-0 z-0">
-            <img src="{{ bg.url }}" alt="" class="w-full h-full object-cover opacity-10">
-            <div class="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent"></div>
-        </div>
-        {% endif %}
+<main class="bg-white min-h-screen py-12 md:py-20" x-data="{ 
+    verified: false, 
+    email: '', 
+    emailError: '',
+    consent: false,
+    consentError: '',
 
-        <div class="relative z-10 max-w-7xl mx-auto px-6 py-16 md:py-24">
-            <div class="max-w-4xl">
-                <!-- Client Branding -->
-                {% if page.client %}
-                <div class="flex items-center gap-3 mb-6 animate-fade-in">
-                    {% if page.client.logo %}
-                    {% image page.client.logo height-32 class="h-8 w-auto" %}
+    validateEmail() {
+        if (!this.email || !this.email.includes('@')) {
+            this.emailError = 'Please enter a valid work email.';
+            return;
+        }
+        const borkedDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'live.com', 'icloud.com'];
+        const domain = this.email.split('@')[1].toLowerCase();
+        if (borkedDomains.includes(domain)) {
+            this.emailError = 'Please use your company email. Public domains e.g. Gmail, Yahoo are not allowed.';
+            return;
+        }
+
+        if (!this.consent) {
+            this.consentError = 'You must agree before proceeding.';
+            return;
+        }
+
+        this.emailError = '';
+        this.consentError = '';
+        this.verified = true;
+    }
+}">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+
+            <!-- Left Side: Content & Form -->
+            <section class="lg:col-span-7 space-y-10">
+                <!-- Header Section -->
+                <header>
+                    <h1 class="text-4xl md:text-5xl font-black text-gray-900 leading-tight mb-4">
+                        {{ block_value.title }}
+                    </h1>
+
+                    {% if page.client %}
+                    <p class="text-lg font-bold text-gray-700">
+                        Published by <span class="text-blue-600">{{ page.client.name }}</span>
+                    </p>
                     {% endif %}
-                    <span class="text-sm font-bold text-gray-500 uppercase tracking-widest">
-                        Published by {{ page.client.name }}
-                    </span>
-                </div>
-                {% endif %}
+                </header>
 
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 leading-tight mb-8">
-                    {{ block_value.title }}
-                </h1>
+                <!-- Body Content -->
+                <article class="prose prose-lg prose-blue max-w-none text-gray-800 leading-relaxed">
+                    {% if block_value.intro_text %}
+                    <div class="mb-8 font-medium">
+                        {{ block_value.intro_text|richtext }}
+                    </div>
+                    {% endif %}
 
-                {% if block_value.intro_text %}
-                <div class="prose prose-lg prose-blue text-gray-600 max-w-none">
-                    {{ block_value.intro_text|richtext }}
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </section>
-
-    <!-- ================= CONTENT & SIDEBAR ================= -->
-    <section class="max-w-7xl mx-auto px-6 py-12">
-        <div class="flex flex-col lg:flex-row gap-12">
-
-            <!-- Main Content Area -->
-            <div class="lg:w-2/3">
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 md:p-12">
                     {% if block_value.body_content %}
-                    <div class="prose prose-blue max-w-none text-gray-700 leading-relaxed">
+                    <div class="space-y-6">
                         {{ block_value.body_content|richtext }}
                     </div>
-                    {% else %}
-                    <p class="text-gray-500 italic">No additional content provided for this whitepaper.</p>
                     {% endif %}
-                </div>
-            </div>
+                </article>
 
-            <!-- Sidebar -->
-            <aside class="lg:w-1/3">
-                <div class="sticky top-24 space-y-8">
+                <!-- Pixel-Perfect Lead Form Card -->
+                <div class="bg-[#003057] rounded-lg shadow-2xl overflow-hidden p-6 md:p-8 lg:p-10 text-white max-w-2xl"
+                    style="background-color: #003057;">
 
-                    <!-- Lead Form Card -->
-                    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
-                        <h3 class="text-xl font-bold text-gray-900 mb-6">
-                            {{ block_value.form_title|default:"Download the Whitepaper" }}
-                        </h3>
+                    <form action="{% pageurl page %}submit/" method="POST" class="space-y-5">
+                        {% csrf_token %}
 
-                        <form action="{% pageurl page %}submit/" method="POST" class="space-y-4">
-                            {% csrf_token %}
-
-                            {% for field in form %}
-                            <div>
-                                <label for="{{ field.id_for_label }}"
-                                    class="block text-sm font-bold text-gray-700 mb-1">
-                                    {{ field.label }}
-                                    {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
-                                </label>
-                                {{ field }}
-                                {% if field.errors %}
-                                <p class="text-red-500 text-xs mt-1">{{ field.errors.0 }}</p>
-                                {% endif %}
+                        <!-- Step 1: Email Verification -->
+                        <div x-show="!verified" class="space-y-8">
+                            <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-3">
+                                <div class="flex items-center gap-3">
+                                    <h3 class="text-2xl sm:text-3xl font-semibold text-[#00a3e0] tracking-tight">
+                                        {{ block_value.form_title|default:"Download Now" }}
+                                    </h3>
+                                    <!-- Download Tray Icon -->
+                                    <svg class="w-6 h-6 sm:w-7 sm:h-7 text-[#00a3e0]" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                                    </svg>
+                                </div>
+                                <p class="text-[10px] sm:text-xs font-medium text-white/70">Required fields*</p>
                             </div>
-                            {% endfor %}
 
+                            <div
+                                class="flex flex-col sm:flex-row gap-0 rounded overflow-hidden shadow-lg border border-white/10">
+                                <input type="email" id="verify-email" x-model="email" name="email"
+                                    class="flex-grow bg-white text-gray-800 px-4 py-3 sm:px-5 sm:py-3.5 focus:outline-none text-base sm:text-lg font-medium placeholder-gray-400 border-none"
+                                    placeholder="Enter work email" @keydown.enter.prevent="validateEmail()">
+                                <button type="button" @click="validateEmail()"
+                                    class="bg-[#00a3e0] hover:bg-[#00b5f5] text-white font-bold px-8 py-3 sm:px-10 sm:py-3.5 transition-all uppercase tracking-wide text-sm sm:text-base">>
+                                    SUBMIT
+                                </button>
+                            </div>
+			    <template x-if="consentError">
+    				<p class="text-red-400 text-xs sm:text-sm font-semibold bg-white/10 px-3 py-2 rounded border border-red-400/20"
+       					x-text="consentError"></p>
+			    </template>
+	
+                            <template x-if="emailError">
+                                <p class="text-red-400 text-xs sm:text-sm font-semibold bg-white/10 px-3 py-2 rounded border border-red-400/20"
+                                    x-text="emailError"></p>
+                            </template>
+
+                            <!-- Legal Section -->
+                            <div class="space-y-4 text-[11px] sm:text-xs leading-relaxed text-white/90">
+                                <!-- Marketing Consent -->
+                                <div class="flex items-start gap-2.5">
+                                    <div class="flex items-center h-4 mt-0.5">
+                                        <input type="checkbox" name="marketing_consent" x-model="consent" required
+                                            class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded border-transparent bg-white/20 text-[#00a3e0] focus:ring-[#00a3e0]">
+                                    </div>
+                                    <div class="prose-sm max-w-none opacity-95">
+                                        {% if block_value.marketing_consent %}
+                                        {{ block_value.marketing_consent|richtext|safe }}
+                                        {% else %}
+                                        By submitting this form you agree to {{ page.client.name|default:"us" }}
+                                        contacting you with marketing-related emails or by telephone. You may
+                                        unsubscribe at any time. Our web sites and communications are subject to our <a
+                                            href="#" class="underline text-white hover:text-[#00a3e0]">Privacy
+                                            Notice</a>.
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Terms and Data Disclaimer -->
+                                <div class="prose-sm max-w-none opacity-80 pl-5 sm:pl-6">
+                                    {% if block_value.privacy_disclaimer %}
+                                    {{ block_value.privacy_disclaimer|richtext|safe }}
+                                    {% else %}
+                                    By requesting this resource you agree to our terms of use. All data is protected by
+                                    our <a href="#" class="underline text-white hover:text-[#00a3e0]">Privacy
+                                        Notice</a>. 
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Full Form -->
+                        <div x-show="verified" x-cloak x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 translate-y-4"
+                            x-transition:enter-end="opacity-100 translate-y-0" class="space-y-5">
+
+                            <!-- Top Submit Button -->
+
+                            <div class="grid grid-cols-1 gap-y-4">
+                                {% for field in form %}
+                                {% if field.name != 'email' %}
+                                <div
+                                    class="{% if field.field.widget.input_type == 'checkbox' or field.field.widget.input_type == 'radio' %}col-span-full{% endif %} whitepaper-field-wrapper">
+                                    <label for="{{ field.id_for_label }}"
+                                        class="block text-[10px] sm:text-[11px] font-bold mb-1.5 uppercase tracking-wide text-blue-200">
+                                        {{ field.label }}
+                                        {% if field.field.required %}
+                                        <span class="text-red-400 ml-0.5">*</span>
+                                        {% endif %}
+                                    </label>
+
+                                    {% if field.field.widget.input_type == "radio" %}
+                                    <div class="space-y-1.5 mt-1.5">
+                                        {% for subwidget in field %}
+                                        <label
+                                            class="flex items-center gap-2.5 bg-white/5 border border-white/10 p-2.5 rounded cursor-pointer hover:bg-white/10 transition-colors group">
+                                            <div class="relative flex items-center justify-center">
+                                                {{ subwidget.tag }}
+                                                <div
+                                                    class="w-3.5 h-3.5 border-2 border-white/30 rounded-full group-hover:border-[#00a3e0] transition-colors">
+                                                </div>
+                                            </div>
+                                            <span class="text-[11px] sm:text-xs font-semibold text-blue-50">{{
+                                                subwidget.choice_label
+                                                }}</span>
+                                        </label>
+                                        {% endfor %}
+                                    </div>
+                                    {% elif field.field.widget.input_type == "checkbox" %}
+                                    <label
+                                        class="flex items-start gap-2.5 bg-white/5 border border-white/10 p-2.5 rounded cursor-pointer hover:bg-white/10 transition-colors mt-1.5">
+                                        {{ field }}
+                                        <span class="text-xs font-semibold text-blue-50 leading-snug">{{
+                                            field.label|safe }}</span>
+                                    </label>
+                                    {% else %}
+                                    {{ field }}
+                                    {% endif %}
+
+                                    {% if field.errors %}
+                                    <p class="text-red-400 text-[10px] mt-1 font-bold">{{ field.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+
+                            <!-- Bottom Submit Button -->
                             <button type="submit"
-                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all transform hover:scale-[1.02] active:scale-95 shadow-lg shadow-blue-200">
-                                {{ block_value.cta_text|default:"Download Now" }}
+                                class="w-full bg-[#00a3e0] hover:bg-[#00b5f5] text-white font-bold py-3 sm:py-3.5 rounded transition-all uppercase tracking-widest text-sm sm:text-base shadow-lg">
+                                SUBMIT
                             </button>
 
-                            <p class="text-[10px] text-gray-400 text-center mt-4">
-                                By submitting this form, you agree to our <a href="/privacy-policy/"
-                                    class="underline">Privacy Policy</a>.
-                            </p>
-                        </form>
-                    </div>
+                            <!-- Bottom Disclaimer -->
+                            <div class="text-[9px] sm:text-[10px] text-white/70 leading-relaxed text-center">
+                                {% if block_value.form_bottom_disclaimer %}
+                                {{ block_value.form_bottom_disclaimer|richtext|safe }}
+                                {% else %}
+                                <p>In order to provide you with this free service we may share your business information
+                                    with companies whose content you choose to view on this website.</p>
+                                <p class="mt-1.5">All information that you supply is protected by our privacy policy and
+                                    you agree to our Terms of Use.</p>
+                                {% endif %}
+                            </div>
+                    </form>
+                </div>
 
-                    <!-- Asset Metadata -->
-                    <div class="bg-gray-100 rounded-2xl p-6 border border-gray-200">
-                        <h4 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Asset Information</h4>
-                        <dl class="space-y-3">
-                            <div class="flex justify-between text-sm">
-                                <dt class="text-gray-500">Published:</dt>
-                                <dd class="font-semibold text-gray-900">{{ page.date|date:"d/m/Y" }}</dd>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <dt class="text-gray-500">Language:</dt>
-                                <dd class="font-semibold text-gray-900">{{ block_value.language }}</dd>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <dt class="text-gray-500">Format:</dt>
-                                <dd class="font-semibold text-gray-900">{{ block_value.whitepaper_type }}</dd>
-                            </div>
-                            {% if block_value.pdf_file %}
-                            <div class="flex justify-between text-sm">
-                                <dt class="text-gray-500">File Size:</dt>
-                                <dd class="font-semibold text-gray-900">{{ block_value.pdf_file.file.size|filesizeformat
-                                    }}</dd>
-                            </div>
-                            {% endif %}
-                        </dl>
+                <!-- Related Categories -->
+                {% if page.categories.exists %}
+                <div class="pt-10 border-t border-gray-100">
+                    <h4 class="text-sm font-black text-gray-400 uppercase tracking-widest mb-6">Related Categories</h4>
+                    <div class="flex flex-wrap gap-2">
+                        {% for category in page.categories.all %}
+                        <a href="{{ page.get_parent.url }}?category={{ category.slug }}"
+                            class="px-4 py-2 bg-gray-50 hover:bg-blue-50 text-gray-600 hover:text-blue-600 rounded-full text-xs font-bold transition-colors border border-gray-100 hover:border-blue-100">
+                            {{ category.name }}
+                        </a>
+                        {% endfor %}
                     </div>
+                </div>
+                {% endif %}
+            </section>
 
+            <!-- Right Side: Asset Preview & Info -->
+            <aside class="lg:col-span-5">
+                <div class="sticky top-12 space-y-12">
+
+                    <!-- Cover Image -->
+                    {% if block_value.cover_image %}
+                    <div class="relative">
+                        {% image block_value.cover_image fill-800x1100 as cover %}
+                        <img src="{{ cover.url }}" alt="{{ block_value.title }}"
+                            class="w-full rounded shadow-2xl border border-gray-100">
+                    </div>
+                    {% endif %}
+
+                    <!-- Metadata List -->
+                    <div class="space-y-4 text-sm font-medium">
+                        <div class="flex items-start gap-4 py-2 border-b border-gray-100">
+                            <span class="text-gray-500 w-24">Published:</span>
+                            <span class="text-gray-900">{{ page.date|date:"d/m/Y" }}</span>
+                        </div>
+                        <div class="flex items-start gap-4 py-2 border-b border-gray-100">
+                            <span class="text-gray-500 w-24">Lang:</span>
+                            <span class="text-gray-900 font-bold">{{ block_value.language|default:"ENG" }}</span>
+                        </div>
+                        <div class="flex items-start gap-4 py-2 border-b border-gray-100">
+                            <span class="text-gray-500 w-24">Type:</span>
+                            <span class="text-gray-900">{{ block_value.whitepaper_type|default:"Whitepaper" }}</span>
+                        </div>
+                        {% if block_value.length %}
+                        <div class="flex items-start gap-4 py-2">
+                            <span class="text-gray-500 w-24">Length:</span>
+                            <span class="text-gray-900">{{ block_value.length }}</span>
+                        </div>
+                        {% elif block_value.pdf_file %}
+                        <div class="flex items-start gap-4 py-2">
+                            <span class="text-gray-500 w-24">Length:</span>
+                            <span class="text-gray-900">{{ block_value.pdf_file.file.size|filesizeformat }}
+                                (approx)</span>
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
             </aside>
 
         </div>
-    </section>
+    </div>
 </main>
 
 <style>
-    /* Custom form styling to match Tailwind */
-    input[type="text"],
-    input[type="email"],
-    select,
-    textarea {
+    /* Premium Form Controls */
+    .whitepaper-field-wrapper input:not([type='checkbox']):not([type='radio']),
+    .whitepaper-field-wrapper select,
+    .whitepaper-field-wrapper textarea {
         width: 100%;
-        padding: 0.75rem 1rem;
-        border: 1px solid #e5e7eb;
-        border-radius: 0.75rem;
-        background-color: #f9fafb;
+        background-color: white;
+        color: #1a202c;
+        padding: 0.625rem 0.875rem;
+        border-radius: 0.25rem;
+        border: 1px solid transparent;
         transition: all 0.2s;
+        font-weight: 500;
+        font-size: 13px;
     }
 
-    input:focus,
-    select:focus,
-    textarea:focus {
+    .whitepaper-field-wrapper input:focus,
+    .whitepaper-field-wrapper select:focus,
+    .whitepaper-field-wrapper textarea:focus {
         outline: none;
-        border-color: #3b82f6;
-        background-color: #ffffff;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        border-color: #00a3e0;
+        box-shadow: 0 0 0 2px rgba(0, 163, 224, 0.2);
     }
 
-    @keyframes fade-in {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    /* Hide default radio/check but keep accessible */
+    .whitepaper-field-wrapper input[type='radio'] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
     }
 
-    .animate-fade-in {
-        animation: fade-in 0.6s ease-out forwards;
+    .whitepaper-field-wrapper input[type='radio']:checked+div {
+        background-color: #00a3e0;
+        border-color: #00a3e0;
+    }
+
+    .whitepaper-field-wrapper input[type='radio']:checked+div::after {
+        content: '';
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        background-color: white;
+        border-radius: 50%;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+
+    @media (min-width: 640px) {
+
+        .whitepaper-field-wrapper input:not([type='checkbox']):not([type='radio']),
+        .whitepaper-field-wrapper select,
+        .whitepaper-field-wrapper textarea {
+            font-size: 14px;
+            padding: 0.75rem 1rem;
+        }
     }
 </style>
 {% endblock %}

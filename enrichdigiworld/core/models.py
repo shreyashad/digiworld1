@@ -112,7 +112,8 @@ class SiteBrandingSettings(BaseSetting):
     )
     contact_phone = models.CharField(
         max_length=50, 
-        default="+ 45 34 11 44 11",
+        blank=True,
+        null=True,
         help_text="Phone number"
     )
     contact_email = models.EmailField(
@@ -141,6 +142,14 @@ class SiteBrandingSettings(BaseSetting):
         on_delete=models.SET_NULL,
         related_name="+",
         help_text="Link to Terms & Conditions page"
+    )
+    cookie_policy_page = models.ForeignKey(
+        "wagtailcore.Page",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        help_text="Link to Cookie Policy page"
     )
 
     footer_logo = models.ForeignKey(
@@ -201,6 +210,7 @@ class SiteBrandingSettings(BaseSetting):
             [
                 PageChooserPanel("privacy_policy_page"),
                 PageChooserPanel("terms_conditions_page"),
+                PageChooserPanel("cookie_policy_page"),
             ],
             heading="Footer Policy Pages",
         ),
@@ -262,9 +272,12 @@ class PolicyPage(Page):
     """Page type for policy pages (Privacy Policy, Terms & Conditions, etc.)"""
     body = RichTextField(blank=True, help_text="Page content")
 
-    panels = Page.content_panels + [
+    content_panels = Page.content_panels + [
         FieldPanel('body'),
     ]
+    
+    parent_page_types = ["home.HomePage"]
+    subpage_types = []
 
     class Meta:
         verbose_name = "Policy Page"

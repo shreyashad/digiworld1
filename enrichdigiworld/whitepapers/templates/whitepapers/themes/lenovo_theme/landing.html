@@ -1,0 +1,436 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags wagtailimages_tags widget_tweaks wagtailroutablepage_tags %}
+
+{% block extra_css %}
+<style>
+    .lenovo-page {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .lenovo-topbar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        background: #fff;
+        border-bottom: 1px solid rgb(192, 192, 192);
+        margin: 0;
+        gap: 0;
+    }
+
+    .lenovo-logo-slot {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+        padding: 18px 15px 10px;
+    }
+
+    .lenovo-logo-slot.left {
+        justify-content: flex-start;
+    }
+
+    .lenovo-logo-slot.right {
+        justify-content: flex-end;
+    }
+
+    .lenovo-logo-slot img {
+        display: block;
+        height: auto;
+        max-width: 100%;
+        object-fit: contain;
+        object-position: center;
+    }
+
+    .lenovo-logo-slot.left img {
+        width: min(47vw, 200px);
+    }
+
+    .lenovo-logo-slot.right img {
+        width: min(48vw, 220px);
+    }
+
+
+    .lenovo-header {
+        background: #000;
+        color: #fff;
+        padding: 3%;
+        text-align: center;
+    }
+
+    .lenovo-header h1 {
+        font-family: "Mark Web Pro", "Century Gothic", sans-serif;
+        font-size: clamp(2rem, 4vw, 3.2rem);
+        line-height: 1.15;
+        margin: 0;
+        letter-spacing: -0.02em;
+    }
+
+    .lenovo-grid {
+        display: grid;
+        grid-template-columns: 7fr 5fr;
+        gap: 0;
+        background: #fff;
+    }
+
+    .lenovo-copy {
+        padding: 30px 28px 20px 18px;
+        text-align: left;
+        font-family: "Mark Web Pro", "Century Gothic", sans-serif;
+        color: #000;
+    }
+
+    .lenovo-copy p {
+        font-family: "Mark Web Pro", "Century Gothic", sans-serif;
+        font-size: 17px;
+        line-height: 1.65;
+        color: #000;
+        font-weight: 500;
+        margin: 0 0 18px;
+    }
+
+    .lenovo-copy .lenovo-hero-image {
+        margin-top: 24px;
+    }
+
+    .lenovo-copy .lenovo-hero-image img {
+        width: 100%;
+        border-radius: 2px;
+        box-shadow: 0 0 1px #000;
+        display: block;
+    }
+    
+    /* Headings */
+.lenovo-copy h2,
+.lenovo-copy h3,
+.lenovo-copy h4 {
+    margin-top: 22px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.lenovo-copy h2 {
+    font-size: 20px;
+}
+
+.lenovo-copy h3 {
+    font-size: 18px;
+}
+
+/* Bullet lists */
+.lenovo-copy ul {
+    margin: 16px 0;
+    padding-left: 22px;
+    list-style-type: disc;
+}
+
+.lenovo-copy ul li {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+/* Numbered lists */
+.lenovo-copy ol {
+    margin: 16px 0;
+    padding-left: 22px;
+}
+
+.lenovo-copy ol li {
+    margin-bottom: 10px;
+}
+
+/* Strong text */
+.lenovo-copy strong {
+    font-weight: 600;
+}
+
+/* Links */
+.lenovo-copy a {
+    color: #000;
+    text-decoration: underline;
+}
+
+/* Blockquote */
+.lenovo-copy blockquote {
+    border-left: 3px solid #000;
+    padding-left: 12px;
+    margin: 16px 0;
+    color: #444;
+}
+
+/* Small spacing fix for lists inside paragraphs */
+.lenovo-copy p + ul,
+.lenovo-copy p + ol {
+    margin-top: -8px;
+}
+
+/* Optional: nicer bullet styling */
+.lenovo-copy ul li::marker {
+    color: #000;
+}
+
+    .lenovo-form {
+        border-left: 1px solid gainsboro;
+        padding: 24px 22px 22px;
+    }
+
+    .lenovo-form-card {
+        background: #fff;
+    }
+
+    .lenovo-field {
+        margin-bottom: 14px;
+    }
+    
+    .lenovo-checkbox-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        color: #000;
+        font-family: "Mark Web Pro", "Century Gothic", sans-serif;
+        font-size: 15px;
+        line-height: 1.5;
+    }
+
+    .lenovo-checkbox-row input[type="checkbox"] {
+        margin-top: 4px;
+        width: 16px;
+        height: 16px;
+        accent-color: #00a3e0;
+        flex: 0 0 auto;
+    }
+    .lenovo-field input:not([type="checkbox"]):not([type="radio"]),
+    .lenovo-field select,
+    .lenovo-field textarea {
+        width: 100%;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        background: #fff;
+        color: #111827;
+        padding: 0.8rem 0.9rem;
+        font-family: "Mark Web Pro", "Century Gothic", sans-serif;
+        font-size: 16px;
+    }
+
+    .lenovo-field input:focus,
+    .lenovo-field select:focus,
+    .lenovo-field textarea:focus {
+        outline: none;
+        border-color: #000;
+        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
+    }
+
+    .lenovo-consent {
+        font-family: "Mark Web Pro", "Century Gothic", sans-serif;
+        font-size: 15px;
+        line-height: 1.55;
+        color: #000;
+        font-weight: 500;
+    }
+    
+    .lenovo-consent-copy {
+        font-family: "Mark Web Pro", "Century Gothic", sans-serif;
+        font-size: 15px;
+        line-height: 1.55;
+        color: #000;
+        font-weight: 500;
+    }
+
+    .lenovo-consent-copy p {
+        margin: 0;
+    }
+
+    .lenovo-submit {
+        background: #000;
+        color: #fff;
+        width: 100%;
+        border: none;
+        border-radius: 0;
+        padding: 0.95rem 1rem;
+        font-family: "Mark Web Pro", "Century Gothic", sans-serif;
+        font-size: 17px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    
+    .lenovo-submit:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+
+    .lenovo-submit:hover {
+        opacity: 0.92;
+    }
+
+    .lenovo-footer {
+        padding: 22px 20px 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.16);
+        text-align: center;
+        color: #000;
+        font: normal 11px/18px "Noto Sans", sans-serif;
+    }
+
+    .lenovo-copy a,
+    .lenovo-consent a {
+        color: #000;
+        text-decoration: underline;
+    }
+   .lenovo-consent-copy p {
+    margin: 0;
+    }
+
+    @media (max-width: 900px) {
+        .lenovo-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .lenovo-form {
+            border-left: none;
+            border-top: 1px solid gainsboro;
+        }
+
+        .lenovo-copy {
+            padding-right: 18px;
+        }
+
+        .lenovo-topbar {
+            grid-template-columns: 1fr;
+            gap: 14px;
+            padding: 12px 0;
+        }
+
+        .lenovo-topbar .right {
+            justify-self: end;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="lenovo-page">
+    <div class="lenovo-topbar">
+        <div class="lenovo-logo-slot left">
+            {% if block_value.logo_left %}
+                {% image block_value.logo_left original %}
+            {% else %}
+                <img src="{% static 'images/lenovo-logo.png' %}" alt="Lenovo">
+            {% endif %}
+        </div>
+        <div class="lenovo-logo-slot right">
+            {% if block_value.logo_right %}
+                {% image block_value.logo_right original %}
+            {% endif %}
+        </div>
+    </div>
+
+    <header class="lenovo-header">
+        <h1>{{ block_value.title }}</h1>
+    </header>
+
+    <div class="lenovo-grid">
+        <section class="lenovo-copy">
+            {% if block_value.landing_description %}
+                {{ block_value.landing_description|richtext }}
+            {% elif block_value.description_paragraph %}
+                {{ block_value.description_paragraph|richtext }}
+            {% elif block_value.intro_text %}
+                {{ block_value.intro_text|richtext }}
+            {% else %}
+                <p>One of the easiest ways to start reaping the benefits of Generative AI: By rolling out AI-enabled PCs to the workforce.</p>
+                <p>91% of global enterprises already considering or piloting this approach.</p>
+                <p>Read about the various ways in which AI PCs can deliver security, productivity, employee experience, and sustainability improvements to your enterprise. Get a step-by-step guide on how to unleash innovation and empower your enterprise with AI PCs like Lenovo Aura Edition devices, imagined with Intel.</p>
+            {% endif %}
+
+            <div class="lenovo-hero-image">
+                {% if block_value.landing_image %}
+                    {% image block_value.landing_image fill-800x560 %}
+                {% elif block_value.preview_banner %}
+                    {% image block_value.preview_banner fill-800x560 %}
+                {% endif %}
+            </div>
+        </section>
+
+        <aside class="lenovo-form">
+            <div class="lenovo-form-card">
+                <form method="post" action="{% routablepageurl page 'submit' %}" class="validate">
+                    {% csrf_token %}
+
+                    <center>
+                        <strong><br></strong>
+                        <br>
+                    </center>
+
+                    <input type="hidden" name="asset_title" value="{{ block_value.title }}">
+
+                    {% for field in form %}
+                        <div class="lenovo-field">
+                            {% if field.field.widget.input_type == "checkbox" %}
+                                <label class="lenovo-consent flex items-start gap-3">
+                                    {{ field }}
+                                    <span>{{ field.label|safe }}</span>
+                                </label>
+                            {% elif field.field.widget.input_type == "radio" %}
+                                <div>
+                                    <label class="block mb-2 font-semibold text-black">{{ field.label }}</label>
+                                    <div class="space-y-2">
+                                        {% for radio in field %}
+                                            <label class="flex items-center gap-2 text-sm text-black">
+                                                {{ radio.tag }}
+                                                <span>{{ radio.choice_label }}</span>
+                                            </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% else %}
+                                {{ field|add_class:"" }}
+                            {% endif %}
+
+                            {% if field.errors %}
+                                <p class="mt-1 text-xs font-semibold text-red-600">{{ field.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+
+                    <div class="mt-5 lenovo-checkbox-row">
+                       <input type="checkbox" name="consent_checkbox" id="lenovo-consent-checkbox" required>
+                           <div class="lenovo-consent-copy">
+                               {% if block_value.consent_text %}
+                                 {{ block_value.consent_text|richtext }}
+                               {% else %}
+                                  Yes, I would like Enrichdigiworld to provide my contact information to share the latest news and offers with me by email or phone.
+                                 {% endif %}
+                            </div>
+                     </div>
+
+
+                    {% if block_value.privacy_notice %}
+                        <div class="lenovo-consent mt-4">
+                            {{ block_value.privacy_notice|richtext }}
+                        </div>
+                    {% else %}
+                        <div class="lenovo-consent mt-4">
+                            By submitting this feedback form, you are providing your consent to receive marketing communication via email and phone from
+                            <a href="https://enrichdigiworld.com/privacy-policy/" target="_blank" rel="noopener">Enrichdigiworld</a>
+                            and its business partners.
+                        </div>
+                    {% endif %}
+
+                    <div class="mt-6">
+                        <button type="submit" id="submit_button" name="submit" value="download" class="lenovo-submit">
+                            {{ block_value.cta_text|default:"Download Now" }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </aside>
+    </div>
+
+    <div class="lenovo-footer">
+        <div style="padding-bottom: 10px;">
+           Copyright @ {% now "Y" %} Enrichdigiworld. All rights reserved
+           <br>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,169 +1,119 @@
 {% load wagtailcore_tags wagtailimages_tags %}
+<section class="py-12 lg:py-16 bg-gradient-to-b from-gray-50 to-gray-100 relative overflow-hidden">
 
-<!-- Whitepapers Section -->
-<section class="whitepapers-section py-5 mb-10">
-  <div class="container">
-    <div class="text-center mb-5">
-      <h2 class="fw-bold mb-2" data-aos="fade-up">{{ block.value.title }}</h2>
+  <div class="max-w-7xl mx-auto px-4">
+
+    <!-- Heading -->
+    <div class="text-center mb-10">
+      <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+        {{ block.value.title }}
+      </h2>
+
       {% if block.value.subtitle %}
-      <p class="text-muted fs-5" data-aos="fade-up" data-aos-delay="200">
+      <p class="text-gray-500 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
         {{ block.value.subtitle }}
       </p>
       {% endif %}
     </div>
 
-    <!-- Category Filters -->
+    <!-- Filters -->
     {% if block.value.show_filters %}
     {% load home_tags %}
     {% get_whitepaper_categories as categories %}
 
     {% if categories %}
-    <div class="d-flex justify-content-center flex-wrap gap-2 mb-5" data-aos="fade-up" data-aos-delay="300">
-      <a href="#" class="btn btn-sm btn-outline-primary active" data-filter="all">All Categories</a>
-      {% for category in categories %}
-      <a href="#" class="btn btn-sm btn-outline-primary" data-filter="{{ category.slug }}">
-        {{ category.name }}
-      </a>
-      {% endfor %}
+    <div class="mb-8">
+      <div class="flex gap-2 overflow-x-auto md:flex-wrap md:justify-center no-scrollbar">
+
+        <button class="px-4 py-1.5 text-sm border border-blue-900 text-blue-900 rounded-full whitespace-nowrap">
+          All
+        </button>
+
+        {% for category in categories %}
+        <button class="px-4 py-1.5 text-sm border border-blue-900 text-blue-900 rounded-full whitespace-nowrap">
+          {{ category.name }}
+        </button>
+        {% endfor %}
+
+      </div>
     </div>
     {% endif %}
     {% endif %}
 
-    <!-- Whitepapers Grid -->
+    <!-- Grid -->
     {% load home_tags %}
     {% get_latest_whitepapers limit=block.value.limit as whitepapers %}
 
     {% if whitepapers %}
-    <div class="row g-4">
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
       {% for whitepaper in whitepapers %}
-      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter|mul:100 }}">
-        <div class="whitepaper-card h-100">
-          {% with preview_img=whitepaper.get_preview_image %}
-          {% if preview_img %}
-          <div class="whitepaper-image mb-3">
-            <a href="{% pageurl whitepaper %}">
-              {% image preview_img max-400x300 class="img-fluid" alt=whitepaper.title %}
-            </a>
-            {% if whitepaper.client %}
-            <span class="badge bg-primary position-absolute top-2 start-2">{{ whitepaper.client.name }}</span>
+      <div class="group bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg transition duration-300 flex flex-col">
+
+        {% with preview_img=whitepaper.get_preview_image %}
+        <div class="relative overflow-hidden rounded-t-2xl bg-gray-100">
+
+          <a href="{% pageurl whitepaper %}">
+            {% if preview_img %}
+              {% image preview_img fill-800x500 class="w-full h-52 object-cover group-hover:scale-105 transition duration-300" alt=whitepaper.title %}
+            {% else %}
+              <div class="h-52 flex items-center justify-center text-gray-600 font-semibold">
+                {{ whitepaper.client.name|default:"Whitepaper" }}
+              </div>
             {% endif %}
-          </div>
+          </a>
+
+          {% if whitepaper.client %}
+          <span class="absolute top-3 left-3 bg-blue-900 text-white text-xs px-3 py-1 rounded-full">
+            {{ whitepaper.client.name }}
+          </span>
+          {% endif %}
+
+        </div>
+        {% endwith %}
+
+        <!-- Content -->
+        <div class="p-4 flex flex-col flex-grow">
+
+          <h3 class="font-semibold text-gray-900 text-base leading-snug mb-2">
+            <a href="{% pageurl whitepaper %}" class="hover:text-blue-900">
+              {{ whitepaper.get_card_title|default:whitepaper.title }}
+            </a>
+          </h3>
+
+          {% with summary=whitepaper.get_summary %}
+          {% if summary %}
+          <p class="text-sm text-gray-500 mb-4 line-clamp-3">
+            {{ summary|striptags|truncatewords:22 }}
+          </p>
           {% endif %}
           {% endwith %}
 
-          <div class="whitepaper-content">
-            <h5 class="fw-bold mb-2">
-              <a href="{% pageurl whitepaper %}" class="text-dark text-decoration-none">
-                {{ whitepaper.title }}
-              </a>
-            </h5>
+          <!-- Footer -->
+          <div class="mt-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
 
-            {% with summary=whitepaper.get_summary %}
-            {% if summary %}
-            <p class="text-muted small mb-3">
-              {{ summary|truncatewords:20|richtext }}
-            </p>
-            {% endif %}
-            {% endwith %}
+            <span class="text-xs text-gray-400">
+              {{ whitepaper.date|date:"d M Y" }}
+            </span>
 
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-muted">
-                {{ whitepaper.first_published_at|date:"d M Y" }}
-              </small>
-              <a href="{% pageurl whitepaper %}" class="btn btn-sm btn-outline-primary">
-                Read More →
-              </a>
-            </div>
+            <a href="{% pageurl whitepaper %}"
+               class="text-sm text-blue-900 border border-blue-900 px-3 py-1 rounded-full hover:bg-blue-900 hover:text-white text-center transition">
+              Read More ?
+            </a>
+
           </div>
         </div>
+
       </div>
       {% endfor %}
+
     </div>
+
     {% else %}
-    <div class="alert alert-info text-center">
-      <p>No whitepapers available yet.</p>
+    <div class="text-center text-gray-500 py-10">
+      No whitepapers available yet.
     </div>
     {% endif %}
+
   </div>
 </section>
-
-<style>
-  .whitepapers-section {
-    background-color: #f8f9fa;
-  }
-
-  .whitepaper-card {
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
-  }
-
-  .whitepaper-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
-  }
-
-  .whitepaper-image {
-    position: relative;
-    overflow: hidden;
-    height: 200px;
-  }
-
-  .whitepaper-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-  }
-
-  .whitepaper-card:hover .whitepaper-image img {
-    transform: scale(1.05);
-  }
-
-  .whitepaper-image .badge {
-    z-index: 1;
-  }
-
-  .whitepaper-content {
-    padding: 20px;
-  }
-
-  .whitepaper-content h5 {
-    color: #003057;
-    font-size: 1.1rem;
-  }
-
-  .whitepaper-content a {
-    transition: color 0.3s ease;
-  }
-
-  .whitepaper-content a:hover {
-    color: #667eea !important;
-  }
-
-  .btn-outline-primary {
-    color: #003057;
-    border-color: #003057;
-  }
-
-  .btn-outline-primary:hover {
-    background-color: #003057;
-    border-color: #003057;
-  }
-
-  @media (max-width: 768px) {
-    .whitepaper-image {
-      height: 150px;
-    }
-
-    .whitepaper-content {
-      padding: 15px;
-    }
-
-    .whitepaper-content h5 {
-      font-size: 1rem;
-    }
-  }
-</style>

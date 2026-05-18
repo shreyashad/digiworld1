@@ -37,21 +37,9 @@
     {% if settings.core.SiteBrandingSettings.primary_color %}
     <style>
         :root {
-            --primary-color: {
-                    {
-                    settings.core.SiteBrandingSettings.primary_color
-                }
-            }
+            --primary-color: {{ settings.core.SiteBrandingSettings.primary_color }};
 
-            ;
-
-            --secondary-color: {
-                    {
-                    settings.core.SiteBrandingSettings.secondary_color
-                }
-            }
-
-            ;
+            --secondary-color: {{ settings.core.SiteBrandingSettings.secondary_color }};
         }
 
         .text-primary {
@@ -178,11 +166,31 @@
                                 class="text-primary">.</strong></span>
                         {% endif %}
                     </a>
+                    {% if settings.core.SiteBrandingSettings.footer_description %}
+                    <p class="max-w-md text-sm leading-7 text-gray-400 mb-8">
+                        {{ settings.core.SiteBrandingSettings.footer_description }}
+                    </p>
+                    {% endif %}
+                    <div class="flex flex-wrap gap-3">
+                        {% if settings.core.SiteBrandingSettings.social_facebook %}
+                        <a href="{{ settings.core.SiteBrandingSettings.social_facebook }}" target="_blank" rel="noopener"
+                            class="text-sm text-gray-300 hover:text-white transition-colors">Facebook</a>
+                        {% endif %}
+                        {% if settings.core.SiteBrandingSettings.social_twitter %}
+                        <a href="{{ settings.core.SiteBrandingSettings.social_twitter }}" target="_blank" rel="noopener"
+                            class="text-sm text-gray-300 hover:text-white transition-colors">X / Twitter</a>
+                        {% endif %}
+                        {% if settings.core.SiteBrandingSettings.social_instagram %}
+                        <a href="{{ settings.core.SiteBrandingSettings.social_instagram }}" target="_blank" rel="noopener"
+                            class="text-sm text-gray-300 hover:text-white transition-colors">Instagram</a>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <!-- DYNAMIC FOOTER COLUMNS -->
                 {% load core_tags %}
                 {% get_footer_columns as footer_columns %}
+                {% if footer_columns %}
                 {% for column in footer_columns %}
                 <div class="col-span-2 md:col-span-4 lg:col-span-2">
                     <h4 class="text-white font-bold text-lg mb-8">{{ column.title }}</h4>
@@ -197,11 +205,13 @@
                     </div>
                 </div>
                 {% endfor %}
-
+                {% endif %}
                 <!-- COLUMN: Contact Info -->
                 <div class="col-span-4 md:col-span-4 lg:col-span-4">
                     <h4 class="text-white font-bold text-lg mb-8">Contact</h4>
                     <div class="space-y-6">
+                      {% if settings.core.SiteBrandingSettings.contact_address %}
+                        
                         <div class="flex gap-4">
                             <!-- Location Icon -->
                             <svg class="h-6 w-6 text-white shrink-0" fill="none" viewBox="0 0 24 24"
@@ -213,6 +223,8 @@
                             </svg>
                             <span class="text-gray-400">{{ settings.core.SiteBrandingSettings.contact_address }}</span>
                         </div>
+                       {% endif %}
+                       {% if settings.core.SiteBrandingSettings.contact_phone %}
                         <div class="flex gap-4">
                             <!-- Phone Icon -->
                             <svg class="h-6 w-6 text-white shrink-0" fill="none" viewBox="0 0 24 24"
@@ -222,6 +234,8 @@
                             </svg>
                             <span class="text-gray-400">{{ settings.core.SiteBrandingSettings.contact_phone }}</span>
                         </div>
+                       {% endif %}
+                       {% if settings.core.SiteBrandingSettings.contact_email %}
                         <div class="flex gap-4">
                             <!-- Email Icon -->
                             <svg class="h-6 w-6 text-white shrink-0" fill="none" viewBox="0 0 24 24"
@@ -231,6 +245,7 @@
                             </svg>
                             <span class="text-gray-400">{{ settings.core.SiteBrandingSettings.contact_email }}</span>
                         </div>
+                      {% endif %}
                     </div>
                 </div>
             </div>
@@ -240,27 +255,193 @@
                 <h4 class="text-gray-400 text-sm text-center lg:text-left font-normal">
                     @{% now "Y" %} {{ current_site.site_name }}. All Rights Reserved.
                 </h4>
-                <div class="flex gap-6 mt-5 lg:mt-0 justify-center lg:justify-end">
-                    {% if settings.core.SiteBrandingSettings.privacy_policy_page %}
-                    <a href="{{ settings.core.SiteBrandingSettings.privacy_policy_page.url }}"
-                        class="text-gray-400 text-sm hover:text-white transition-colors">Privacy policy</a>
-                    {% else %}
-                    <a href="#" class="text-gray-400 text-sm hover:text-white transition-colors">Privacy policy</a>
-                    {% endif %}
-                    <span class="text-gray-700">|</span>
-                    {% if settings.core.SiteBrandingSettings.terms_conditions_page %}
-                    <a href="{{ settings.core.SiteBrandingSettings.terms_conditions_page.url }}"
-                        class="text-gray-400 text-sm hover:text-white transition-colors">Terms & conditions</a>
-                    {% else %}
-                    <a href="#" class="text-gray-400 text-sm hover:text-white transition-colors">Terms & conditions</a>
-                    {% endif %}
+                <div class="flex gap-4 mt-5 lg:mt-0 justify-center lg:justify-end flex-wrap">
+                  {% if settings.core.SiteBrandingSettings.privacy_policy_page %}
+                     {% pageurl settings.core.SiteBrandingSettings.privacy_policy_page as privacy_url %}
+                        {% if privacy_url %}
+                          <a href="{{ privacy_url }}"
+                            class="text-gray-400 text-sm hover:text-white transition-colors">
+                            Privacy Policy
+                          </a>
+                        {% endif %}
+                     {% endif %}
+
+    		  {% if settings.core.SiteBrandingSettings.terms_conditions_page %}
+        	     {% pageurl settings.core.SiteBrandingSettings.terms_conditions_page as terms_url %}
+                        {% if terms_url %}
+                           {% if privacy_url %}
+                            <span class="text-gray-700">|</span>
+                           {% endif %}
+                          <a href="{{ terms_url }}"
+                            class="text-gray-400 text-sm hover:text-white transition-colors">
+                               Terms & Conditions
+                          </a>
+                        {% endif %}
+                     {% endif %}
+                 {% if settings.core.SiteBrandingSettings.cookie_policy_page %}
+                     {% pageurl settings.core.SiteBrandingSettings.cookie_policy_page as cookie_url %}
+                        {% if cookie_url %}
+                          {% if privacy_url or terms_url %}
+                            <span class="text-gray-700">|</span>
+                           {% endif %}
+                          <a href="{{ cookie_url }}"
+                            class="text-gray-400 text-sm hover:text-white transition-colors">
+                               Cookie's Policy
+                          </a>
+                        {% endif %}
+                     {% endif %}
                 </div>
+
             </div>
         </div>
     </footer>
 
     {# Global javascript #}
-    <script type="text/javascript" src="{% static 'js/enrichdigiworld.js' %}"></script>
+    <!-- COOKIE CONSENT ROOT -->
+   <div 
+     x-data="cookieConsent()" 
+     x-init="init()"
+     class="relative z-50"
+    >
+
+    <!-- BANNER -->
+    <div 
+        x-show="visible" 
+        x-transition
+        class="fixed inset-x-0 bottom-0 px-4 pb-4 sm:px-6 lg:px-8"
+    >
+        <div class="mx-auto w-full max-w-4xl rounded-2xl bg-white border border-gray-200 shadow-xl p-5">
+            
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                
+                <!-- TEXT -->
+                <div class="max-w-2xl">
+                    <h2 class="text-lg font-semibold text-gray-900">
+                        Cookie preferences
+                    </h2>
+                    <p class="mt-2 text-sm text-gray-600">
+                        We use essential cookies to keep the site working. You can accept all cookies or manage preferences.
+                        <a href="/privacy-policy/" class="text-blue-600 underline">
+                            Read Cookie Policy
+                        </a>
+                    </p>
+                </div>
+
+                <!-- BUTTONS -->
+                <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                    <button 
+                        @click="acceptEssential()"
+                        class="w-full sm:w-auto px-5 py-3 text-sm font-semibold border border-gray-300 rounded-full hover:bg-gray-100 transition"
+                    >
+                        Essential only
+                    </button>
+
+                    <button 
+                        @click="acceptAll()"
+                        class="w-full sm:w-auto px-5 py-3 text-sm font-semibold bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
+                    >
+                        Accept all
+                    </button>
+
+                    <button 
+                        @click="openSettings()"
+                        class="w-full sm:w-auto px-5 py-3 text-sm font-semibold text-gray-600 hover:text-blue-600 transition"
+                    >
+                        Preferences
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div 
+        x-show="settingsOpen" 
+        x-transition
+        class="fixed inset-0 flex items-center justify-center bg-black/40 px-4 z-50"
+    >
+        <div class="w-full max-w-lg bg-white rounded-2xl shadow-2xl p-6">
+
+            <!-- HEADER -->
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold">Cookie Settings</h2>
+                <button @click="settingsOpen = false" class="text-gray-500 text-xl">&times;</button>
+            </div>
+
+            <!-- CONTENT -->
+            <div class="mt-6 space-y-4 text-sm text-gray-600">
+
+                <div class="p-4 border rounded-xl bg-gray-50">
+                    <h3 class="font-semibold text-gray-900">Essential cookies</h3>
+                    <p>Required for basic functionality.</p>
+                    <span class="text-xs text-green-600 font-semibold">Always active</span>
+                </div>
+
+                <div class="p-4 border rounded-xl">
+                    <h3 class="font-semibold text-gray-900">Analytics cookies</h3>
+                    <p>Currently not used.</p>
+                </div>
+
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-end">
+                <button 
+                    @click="acceptEssential()"
+                    class="px-5 py-3 border rounded-full"
+                >
+                    Essential only
+                </button>
+
+                <button 
+                    @click="acceptAll()"
+                    class="px-5 py-3 bg-blue-600 text-white rounded-full"
+                >
+                    Accept all
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+<!-- ALPINE LOGIC -->
+<script>
+function cookieConsent() {
+    return {
+        visible: false,
+        settingsOpen: false,
+
+        init() {
+            const consent = localStorage.getItem('cookieConsent');
+            if (!consent) {
+                this.visible = true;
+            }
+        },
+
+        acceptEssential() {
+            localStorage.setItem('cookieConsent', 'essential');
+            this.visible = false;
+            this.settingsOpen = false;
+        },
+
+        acceptAll() {
+            localStorage.setItem('cookieConsent', 'all');
+            this.visible = false;
+            this.settingsOpen = false;
+        },
+
+        openSettings() {
+            this.settingsOpen = true;
+        }
+    }
+}
+</script>
+    
+
 
     {% block extra_js %}
     {# Override this in templates to add extra javascript #}

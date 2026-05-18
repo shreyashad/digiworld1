@@ -162,7 +162,7 @@
       const counters = document.querySelectorAll('.counter');
 
       const animateCounter = (counter) => {
-        const target = parseInt(counter.getAttribute('data-target'));
+        const target = parseFloat(counter.getAttribute('data-target'));
         const symbol = counter.getAttribute('data-symbol') || '';
         const duration = 2000;
         const increment = target / (duration / 10);
@@ -174,7 +174,7 @@
             counter.textContent = target + symbol;
             clearInterval(timer);
           } else {
-            counter.textContent = Math.floor(current) + symbol;
+            counter.textContent =  current % 1 === 0 ? current : current.toFixed(1) + symbol;
           }
         }, 10);
       };

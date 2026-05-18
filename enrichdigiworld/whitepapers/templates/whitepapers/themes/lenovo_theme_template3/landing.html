@@ -1,0 +1,430 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags wagtailimages_tags widget_tweaks wagtailroutablepage_tags %}
+
+{% block extra_css %}
+<style>
+    .lenovo3-page {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .lenovo3-topbar {
+        display: grid;
+        grid-template-columns: 1fr;
+        align-items: center;
+        background: #fff;
+        border-bottom: 1px solid rgb(192, 192, 192);
+        margin: 0;
+        gap: 0;
+    }
+
+    .lenovo3-logo-slot {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+        padding: 18px 15px 10px;
+    }
+
+    .lenovo3-logo-slot.left {
+        justify-content: flex-start;
+    }
+
+    .lenovo3-logo-slot img {
+        display: block;
+        height: auto;
+        max-width: 100%;
+        object-fit: contain;
+        object-position: center;
+    }
+
+    .lenovo3-logo-slot.left img {
+        width: min(47vw, 200px);
+    }
+
+    .lenovo3-header {
+        background: #000;
+        color: #fff;
+        padding: 40px 20px;
+        text-align: center;
+    }
+
+    .lenovo3-header h1 {
+        font-family: "Arial", "Helvetica", "sans-serif"; 
+        font-size: 34px;          /* closer to Lenovo landing */
+        line-height: 1.25;
+        font-weight: 700;         /* bold like reference */
+        margin: 0;
+        letter-spacing: -0.01em;    
+    }
+
+    .lenovo3-grid {
+        display: grid;
+        grid-template-columns: 7fr 5fr;
+        gap: 0;
+        background: #fff;
+    }
+
+    .lenovo3-copy {
+        padding: 30px 28px 20px 18px;
+        text-align: left;
+    }
+
+    .lenovo3-copy p {
+        font-family: "Arial", "Helvetica", "sans-serif";
+        font-size: 17px;
+        line-height: 1.65;
+        color: #000;
+        font-weight: 500;
+        margin: 0 0 18px;
+    }
+
+    .lenovo3-copy .lenovo3-hero-image {
+        margin-top: 24px;
+    }
+
+    .lenovo3-copy .lenovo3-hero-image img {
+        width: 100%;
+        border-radius: 2px;
+        box-shadow: 0 0 1px #000;
+        display: block;
+    }
+
+    .lenovo3-copy .lenovo3-questions {
+        margin: 18px 0 0;
+        padding-top: 12px;
+        border-top: 1px solid #d1d5db;
+    }
+
+    .lenovo3-copy .lenovo3-questions h2 {
+        margin: 0 0 10px;
+        font-family: "Mark Web Pro", "Century Gothic", sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #111;
+    }
+
+    .lenovo3-question {
+        margin: 0 0 10px;
+        padding-left: 14px;
+        border-left: 2px solid #e2231a;
+        font-family: "Mark Web Pro", "Century Gothic", sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #111;
+    }
+
+    .lenovo3-form {
+        border-left: 1px solid gainsboro;
+        padding: 24px 22px 22px;
+    }
+
+    .lenovo3-form-card {
+        background: #fff;
+    }
+
+    .lenovo3-field {
+        margin-bottom: 14px;
+    }
+
+    .lenovo3-checkbox-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        color: #000;
+        font-family: "Mark Web Pro", "Century Gothic", sans-serif;
+        font-size: 15px;
+        line-height: 1.5;
+    }
+
+    .lenovo3-checkbox-row input[type="checkbox"] {
+        margin-top: 4px;
+        width: 16px;
+        height: 16px;
+        accent-color: #00a3e0;
+        flex: 0 0 auto;
+    }
+
+    .lenovo3-field input:not([type="checkbox"]):not([type="radio"]),
+    .lenovo3-field select,
+    .lenovo3-field textarea {
+        width: 100%;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        background: #fff;
+        color: #111827;
+        padding: 0.8rem 0.9rem;
+        font-family: "Mark Web Pro", "Century Gothic", sans-serif;
+        font-size: 16px;
+    }
+
+    .lenovo3-field input:focus,
+    .lenovo3-field select:focus,
+    .lenovo3-field textarea:focus {
+        outline: none;
+        border-color: #000;
+        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
+    }
+
+    .lenovo3-consent {
+        font-family: "Mark Web Pro", "Century Gothic", sans-serif;
+        font-size: 15px;
+        line-height: 1.55;
+        color: #000;
+        font-weight: 500;
+    }
+
+    .lenovo3-consent-copy {
+        font-family: "Mark Web Pro", "Century Gothic", sans-serif;
+        font-size: 15px;
+        line-height: 1.55;
+        color: #000;
+        font-weight: 500;
+    }
+
+    .lenovo3-consent-copy p,
+    .lenovo3-consent p {
+        margin: 0;
+    }
+
+    .lenovo3-submit {
+        background: #000;
+        color: #fff;
+        width: 100%;
+        border: none;
+        border-radius: 0;
+        padding: 0.95rem 1rem;
+        font-family: "Mark Web Pro", "Century Gothic", sans-serif;
+        font-size: 17px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .lenovo3-submit:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+
+    .lenovo3-submit:hover {
+        opacity: 0.92;
+    }
+
+    .lenovo3-footer {
+        padding: 22px 20px 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.16);
+        text-align: center;
+        color: #000;
+        font: normal 11px/18px "Noto Sans", sans-serif;
+    }
+
+    .lenovo3-copy a,
+    .lenovo3-consent a {
+        color: #000;
+        text-decoration: underline;
+    }
+
+    .lenovo2-bullet-list ul {
+    list-style: disc;
+    padding-left: 1.5rem;
+    margin: 0;
+  }
+
+  .lenovo3-bullet-list li {
+    margin-bottom: 0.85rem;
+}
+  /* Bullet lists */
+ .lenovo3-copy ul {
+    margin: 16px 0;
+    padding-left: 22px;
+    list-style-type: disc;
+ }
+
+ .lenovo3-copy ul li {
+    margin-bottom: 10px;
+    line-height: 1.6;
+ }
+
+/* Numbered lists */
+ .lenovo3-copy ol {
+    margin: 16px 0;
+    padding-left: 22px;
+ }
+
+ .lenovo3-copy ol li {
+    margin-bottom: 10px;
+ }
+
+    @media (max-width: 768px) {
+       .lenovo3-header h1 {
+        font-size: 26px;
+        line-height: 1.3;
+       }
+        .lenovo3-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .lenovo3-form {
+            border-left: none;
+            border-top: 1px solid gainsboro;
+        }
+
+        .lenovo3-copy {
+            padding-right: 18px;
+        }
+
+        .lenovo3-topbar {
+            padding: 12px 0;
+        }
+
+        .lenovo3-logo-slot {
+            padding: 12px 15px 0;
+        }
+
+        .lenovo3-logo-slot.left img {
+            width: min(72vw, 180px);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="lenovo3-page">
+    <div class="lenovo3-topbar">
+        <div class="lenovo3-logo-slot left">
+            {% if block_value.logo_left %}
+                {% image block_value.logo_left original %}
+            {% else %}
+                <img src="{% static 'images/lenovo-logo.png' %}" alt="Lenovo">
+            {% endif %}
+        </div>
+    </div>
+
+    <header class="lenovo3-header">
+         <h1>{{ block_value.title }}</h1>
+                    
+
+    </header>
+
+    <div class="lenovo3-grid">
+        <section class="lenovo3-copy">
+            {% if block_value.landing_description %}
+                {{ block_value.landing_description|richtext }}
+            {% elif block_value.description_paragraph %}
+                {{ block_value.description_paragraph|richtext }}
+            {% elif block_value.intro_text %}
+                {{ block_value.intro_text|richtext }}
+            {% endif %}
+            {% if block_value.question_points %}
+                <div class="lenovo3-bullet-list">
+                    <ul>
+                        {% for item in block_value.question_points %}
+                            <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <div class="lenovo3-hero-image">
+                {% if block_value.landing_image %}
+                    {% image block_value.landing_image fill-800x560 %}
+                {% elif block_value.preview_banner %}
+                    {% image block_value.preview_banner fill-800x560 %}
+                {% endif %}
+            </div>
+        </section>
+
+        <aside class="lenovo3-form">
+            <div class="lenovo3-form-card">
+                <form method="post" action="{% routablepageurl page 'submit' %}" class="validate">
+                    {% csrf_token %}
+
+                    <input type="hidden" name="asset_title" value="{{ block_value.title }}">
+	            {% for item in block_value.form_fields %}
+                    {% if item.field_type == "heading" %}
+                        <div class="mt-6 mb-2">
+                            <p class="text-[16px] font-bold text-gray-900 leading-snug">
+                                {{ item.label }}
+                            </p>
+                        </div>
+
+                        {% for field in form %}
+                            {% if field.name == item.name %}
+                                <div class="lenovo3-field">
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+
+                    {% for field in form %}
+                        {% if field.name == item.name %}
+                        <div class="lenovo3-field">
+                            {% if field.field.widget.input_type == "checkbox" %}
+                                <label class="lenovo3-consent flex items-start gap-3">
+                                    {{ field }}
+                                    <span>{{ field.label|safe }}</span>
+                                </label>
+                            {% elif field.field.widget.input_type == "radio" %}
+                                <div>
+                                    <label class="block mb-2 font-semibold text-black">{{ field.label }}</label>
+                                    <div class="space-y-2">
+                                        {% for radio in field %}
+                                            <label class="flex items-center gap-2 text-sm text-black">
+                                                {{ radio.tag }}
+                                                <span>{{ radio.choice_label }}</span>
+                                            </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% else %}
+                                {{ field|add_class:"" }}
+                            {% endif %}
+
+                            {% if field.errors %}
+                                <p class="mt-1 text-xs font-semibold text-red-600">{{ field.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    {% endif %} {% endfor %} {% endif %} {% endfor %}
+                    <div class="mt-5 lenovo3-checkbox-row">
+                        <input type="checkbox" name="consent_checkbox" id="lenovo3-consent-checkbox" required>
+                        <div class="lenovo3-consent-copy">
+                            {% if block_value.consent_text %}
+                                {{ block_value.consent_text|richtext }}
+                            {% else %}
+                                Yes, I would like Enrichdigiworld to provide my contact information to share the latest news and offers with me by email or phone.
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if block_value.privacy_notice %}
+                        <div class="lenovo3-consent mt-4">
+                            {{ block_value.privacy_notice|richtext }}
+                        </div>
+                    {% else %}
+                        <div class="lenovo3-consent mt-4">
+                            By submitting this feedback form, you are providing your consent to receive marketing communication via email and phone from
+                            <a href="https://enrichdigiworld.com/privacy-policy/" target="_blank" rel="noopener">Enrichdigiworld</a>
+                            and its business partners.
+                        </div>
+                    {% endif %}
+
+                    <div class="mt-6">
+                        <button type="submit" id="submit_button" name="submit" value="download" class="lenovo3-submit">
+                            {{ block_value.cta_text|default:"Download Now" }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </aside>
+    </div>
+
+    <div class="lenovo3-footer">
+        <div style="padding-bottom: 10px;">
+           Copyright @ {% now "Y" %} Enrichdigiworld. All rights reserved
+           <br>
+        </div>
+    </div>
+</div>
+{% endblock %}
